@@ -1,0 +1,91 @@
+#+title: Nixt
+
+Nixt is a unit-testing tool for Nixlang.
+
+* Installation
+
+- Add this repository to =nixpkgs.overlays=
+- Add =nixt= to =environment.systemPackages= or =home.packages=
+
+* Help
+#+begin_src text
+  Run Nixlang unit-tests
+
+  Usage:
+    nixt [options] [path]
+
+  Arguments:
+    [path]           Path of source and tests (default: .)
+
+  Options:
+    -d, --debug                Print debug information
+    -v, --verbose              Print extra information
+    -l, --list                 List discovered test suites
+    -h, --help                 Show this help
+#+end_src
+
+* Getting Started
+
+The =nixt= discovers and runs tests located at =path=:
+
+#+begin_src text
+  # nixt ~/fooproj/src
+
+  Found 3 test suites
+  > always passes (/home/ldlework/fooproj/src/tests/always-pass.nix)
+  -- ✔ always true
+  > always fails (/home/ldlework/fooproj/src/tests/always-pass.nix)
+  -- ✗ always false
+  > syntax error (/home/ldlework/fooproj/src/tests/syntax-error.nix)
+  -- ✗ missing semicolon
+
+  ⚠ 1 test PASSED but 2 tests FAILED ⚠
+#+end_src
+
+Adding in the =-v/--verbose= flag will show additional information on failed test
+cases:
+
+#+begin_src text
+  # nixt -v ~/fooproj/src
+
+  Found 3 test suites
+  > always passes (/home/ldlework/fooproj/src/tests/always-pass.nix)
+  -- ✔ always true
+  > always fails (/home/ldlework/fooproj/src/tests/always-pass.nix)
+  -- ✗ always false
+  > syntax error (/home/ldlework/fooproj/src/tests/syntax-error.nix)
+  -- ✗ missing semicolon
+  error: syntax error, unexpected $end, expecting ';', at /home/ldlework/src/fooproj/src/options1.nix:10:2
+  (use '--show-trace' to show detailed location information)
+  ⚠ 1 test PASSED but 2 tests FAILED ⚠
+#+end_src
+
+Two =-v -v= verbose flags implies =--show-trace=.
+
+* Writing Tests
+
+Nixt tests are written in =.nix= files that:
+
+- Contain a function taking attrset args =pkgs= and =nixt=
+- Evaluate to a call to =nixt.mkSuite=
+
+#+begin_src nix
+  { pkgs ? import <nixpkgs> {}, nixt }:
+
+  nixt.mkSuite "always passes" {
+    "always true" = true;
+  }
+#+end_src
+
+** =nixt.mkSuite=
+=mkSuite= takes two arguments:
+
+- suite name/description
+- attrset of test cases
+
+Each test case maps from case name/description to result.
+
+Test case results should be a boolean specifying whether the case passed or
+failed.
+
+Test cases may also throw a string to provide additional information about a failure.
