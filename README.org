@@ -26,7 +26,7 @@ Nixt is a unit-testing tool for Nixlang.
 
 * Getting Started
 
-The =nixt= discovers and runs tests located at =path=:
+The =nixt= CLI discovers and runs tests located at =path=:
 
 #+begin_src text
   # nixt ~/fooproj/src
