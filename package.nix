@@ -11,9 +11,10 @@ in pkgs.stdenv.mkDerivation {
   buildPhase = ''
     mkdir -p $out/bin
     cp -r $src/* $out
-    EXPR="(import $out/nixt.nix { args = \"'\$@'\"; })"
+    EXPR="(import $out/nixt.nix { args = \"'\$NIX_FILE'\"; })"
     echo "#!${pkgs.stdenv.shell}
-    ${pkgs.nix}/bin/nix eval --json --show-trace '$EXPR'" > $out/bin/nixt
+    NIX_FILE=\$1; shift;
+    ${pkgs.nix}/bin/nix eval $@ '$EXPR'" > $out/bin/nixt
     chmod +x $out/bin/nixt
   '';
 }
