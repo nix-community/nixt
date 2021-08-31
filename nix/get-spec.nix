@@ -5,6 +5,16 @@ with (import ./utils.nix { inherit pkgs; });
 
 import path {
   nixt = {
-    mkSuite = name: cases: { inherit name; cases = mapAttrsToList (k: v: k) cases; };
+    mkSuite = name: cases: { 
+      inherit name;
+      cases = mapAttrsToList (
+        testName: test:
+          {
+            src = path;
+            case = testName;
+            result = test;
+          }
+      ) cases;
+    };
   };
 }
