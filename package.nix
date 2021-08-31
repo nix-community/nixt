@@ -14,7 +14,7 @@ in pkgs.stdenv.mkDerivation {
     EXPR="(import $out/nixt.nix { args = \"'\$NIX_FILE'\"; })"
     echo "#!${pkgs.stdenv.shell}
     NIX_FILE=\$1; shift;
-    ${pkgs.nix}/bin/nix eval $@ '$EXPR'" > $out/bin/nixt
+    ${pkgs.nix}/bin/nix eval \$@ '$EXPR'" > $out/bin/nixt
     chmod +x $out/bin/nixt
   '';
 }
