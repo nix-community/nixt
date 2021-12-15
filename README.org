@@ -4,60 +4,109 @@ Nixt is a unit-testing tool for Nixlang.
 
 * Installation
 
-- Add this repository to =nixpkgs.overlays=
-- Add =nixt= to =environment.systemPackages= or =home.packages=
+Add Nixt as a flake to your configuration:
 
+#+begin_src nix
+  nixt = {
+    url = "path:/home/ldlework/src/nixt";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+#+end_src
+
+Then add the package to your packages:
+
+#+begin_src nix
+  environment.systemPackages = [
+    inputs.nixt.defaultPackage.x86_64-linux
+  ];
+#+end_src
 * Help
 #+begin_src text
-  Run Nixlang unit-tests
+nixt
 
-  Usage:
-    nixt [options] [path]
+  Test-runner for nixlang.
 
-  Arguments:
-    [path]           Path of source and tests (default: .)
+Options
 
-  Options:
-    -d, --debug                Print debug information
-    -v, --verbose              Print extra information
-    -l, --list                 List discovered test suites
-    -h, --help                 Show this help
+  -p, --path string   Path to the test suite [required]
+  -d, --debug         Show nixt-developent relevant info
+  -v, --verbose       Show additional test info
+  -l, --list          List, but don't run, tests
+  -h, --help          Prints this usage guide
 #+end_src
 
 * Getting Started
 
-The =nixt= CLI discovers and runs tests located at =path=:
+The =nixt= CLI discovers and runs tests located at =--path/-p=:
 
 #+begin_src text
-  # nixt ~/fooproj/src
+$ nixt -p ./nix/
 
-  Found 3 test suites
-  > always passes (/home/ldlework/fooproj/src/tests/always-pass.nix)
-  -- ✔ always true
-  > always fails (/home/ldlework/fooproj/src/tests/always-pass.nix)
-  -- ✗ always false
-  > syntax error (/home/ldlework/fooproj/src/tests/syntax-error.nix)
-  -- ✗ missing semicolon
+Found 14 cases in 8 suites over 3 files.
 
-  ⚠ 1 test PASSED but 2 tests FAILED ⚠
+  ✗ 2 cases failed.
+
+┏ /home/ldlework/src/nixt/cli/nix/get-testset.test.nix
+┃   mkSuites
+┗     ✗ always fails
+
+┏ /home/ldlework/src/nixt/cli/nix/utils.test.nix
+┃   broken test
+┗     ✗ undefined variable
+
+  ⚠ Couldn't import 1 files:
+    - /home/ldlework/src/nixt/cli/nix/invalid.test.nix
+      Import error: called with unexpected argument 'nixt'
+      Did you forgot to add the 'nixt' argument to your test expression?
 #+end_src
 
-Adding in the =-v/--verbose= flag will show additional information on failed test
-cases:
+Adding in the =-v/--verbose= flag will show passing cases and additional
+information on failed cases:
 
 #+begin_src text
-  # nixt -v ~/fooproj/src
+$ nixt -p ./nix/ -v
 
-  Found 3 test suites
-  > always passes (/home/ldlework/fooproj/src/tests/always-pass.nix)
-  -- ✔ always true
-  > always fails (/home/ldlework/fooproj/src/tests/always-pass.nix)
-  -- ✗ always false
-  > syntax error (/home/ldlework/fooproj/src/tests/syntax-error.nix)
-  -- ✗ missing semicolon
-  error: syntax error, unexpected $end, expecting ';', at /home/ldlework/src/fooproj/src/options1.nix:10:2
-  (use '--show-trace' to show detailed location information)
-  ⚠ 1 test PASSED but 2 tests FAILED ⚠
+Found 14 cases in 8 suites over 3 files.
+
+  ✗ 2 cases failed.
+
+┏ /home/ldlework/src/nixt/cli/nix/get-testset.test.nix
+┃   mkSuite
+┃     ✓ creates correct structure
+┃   mkSuites
+┃     ✗ always fails
+┗     ✓ creates correct structure
+
+┏ /home/ldlework/src/nixt/cli/nix/utils.test.nix
+┃   broken test
+┃     ✗ undefined variable
+┃       error: undefined variable 'baz'
+┃       at /home/ldlework/src/nixt/cli/nix/utils.test.nix:12:30:
+┃       11|     "broken test" = {
+┃       12|       "undefined variable" = baz;
+┃       |                              ^
+┃       13|     };
+┃       (use '--show-trace' to show detailed location information)
+┃   dirFiles
+┃     ✓ empty list for non-existent path
+┃     ✓ non-empty list for existing path
+┃   findNixFiles
+┃     ✓ empty list for non-existent path
+┃     ✓ non-empty list for existing path
+┃   getDir
+┃     ✓ empty list for non-existent path
+┃     ✓ non-empty list for existing path
+┃   isNix
+┃     ✓ false for non-nix files
+┃     ✓ true for nix files
+┃   isTestSuite
+┃     ✓ false for non-test suites
+┗     ✓ true for test suites
+
+  ⚠ Couldn't import 1 files:
+    - /home/ldlework/src/nixt/cli/nix/invalid.test.nix
+      Import error: called with unexpected argument 'nixt'
+      Did you forgot to add the 'nixt' argument to your test expression?
 #+end_src
 
 Two =-v -v= verbose flags implies =--show-trace=.
@@ -66,15 +115,32 @@ Two =-v -v= verbose flags implies =--show-trace=.
 
 Nixt tests are written in =.nix= files that:
 
-- Contain a function taking attrset args =pkgs= and =nixt=
-- Evaluate to a call to =nixt.mkSuite=
+- Has a `.test.nix` extension
+- Contains a function taking attrset args =pkgs= and =nixt=
+- Evaluates to a call of =nixt.mkSuite= or =nixt.mkSuites=
+
+*mkSuite*
 
 #+begin_src nix
   { pkgs ? import <nixpkgs> {}, nixt }:
 
   nixt.mkSuite "always passes" {
-    "always true" = true;
+    "always true" = true; # the expression here should test something
   }
+#+end_src
+
+*mkSuites*
+#+begin_src nix
+    { pkgs ? import <nixpkgs> {}, nixt }:
+
+    nixt.mkSuites {
+      "foo suite" {
+        "foo is foo" = "foo" == "foo";
+      };
+      "bar suite" {
+        "bar is bar" = "bar" == "baz";
+      };
+    }
 #+end_src
 
 ** =nixt.mkSuite=
@@ -88,4 +154,20 @@ Each test case maps from case name/description to result.
 Test case results should be a boolean specifying whether the case passed or
 failed.
 
-Test cases may also throw a string to provide additional information about a failure.
+Test cases may also throw a string to provide additional information about a
+failure.
+
+** =nixt.mkSuites=
+=mkSuites= takes a single argument, an attrset that:
+
+- maps suite name => suite
+
+Each suite is an attrset that:
+
+- maps case name => boolean result
+
+Test case results should be a boolean specifying whether the case passed or
+failed.
+
+Test cases may also throw a string to provide additional information about a
+failure.
