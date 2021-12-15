@@ -7,18 +7,22 @@ Nixt is a unit-testing tool for Nixlang.
 Add Nixt as a flake to your configuration:
 
 #+begin_src nix
-  nixt = {
-    url = "path:/home/ldlework/src/nixt";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
+  {
+    inputs.nixt = {
+      url = "path:/home/ldlework/src/nixt";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  }
 #+end_src
 
 Then add the package to your packages:
 
 #+begin_src nix
-  environment.systemPackages = [
-    inputs.nixt.defaultPackage.x86_64-linux
-  ];
+  {
+    environment.systemPackages = [
+      inputs.nixt.defaultPackage.x86_64-linux
+    ];
+  }
 #+end_src
 * Help
 #+begin_src text
@@ -205,10 +209,10 @@ Defines multiple suites of cases for the file.
     { pkgs ? import <nixpkgs> {}, nixt }:
 
     nixt.mkSuites {
-      "foo suite" {
+      "foo suite" = {
         "foo is foo" = "foo" == "foo";
       };
-      "bar suite" {
+      "bar suite" = {
         "bar is bar" = "bar" == "baz";
       };
     }
