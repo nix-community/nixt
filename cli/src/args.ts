@@ -11,13 +11,13 @@ export interface NixtCliArgs{
 
  export const parseArgs = () => parse<NixtCliArgs>({
     path: { type: String, alias: 'p', description: 'Path to the test suite [required]' },
-    debug: { type: Boolean, alias: 'd' },
-    verbose: { type: Boolean, alias: 'v' },
-    list: { type: Boolean, alias: 'l' },
+    debug: { type: Boolean, alias: 'd', description: 'Show nixt-developent relevant info' },
+    verbose: { type: Boolean, alias: 'v', description: 'Show additional test info' },
+    list: { type: Boolean, alias: 'l', description: `List, but don't run, tests` },
     help: { type: Boolean, alias: 'h', description: 'Prints this usage guide' },
 },
 {
     helpArg: 'help',
-    headerContentSections: [{ header: 'nixt', content: 'Simple nixlang test-runner' }],
+    headerContentSections: [{ header: 'nixt', content: 'Test-runner for nixlang.' }],
 });
 
