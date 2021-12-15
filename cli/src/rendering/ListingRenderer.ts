@@ -8,5 +8,16 @@ export class ListingRenderer extends BaseRenderer {
       const glyph = lastSuite && lastCase ? '┗' : '┃';
       console.log(`${gray(glyph)}     - ${testCase.name}`);
     }
+
+    render() {
+        this.renderSummary();
+        if (this.verbose) {
+            console.log('')
+            for (const file of this.importSuccesses) {
+            this.renderFile(file);
+            }
+        }
+        this.renderWarnings();
+    }
   }
 
