@@ -1,68 +1,129 @@
-import { magenta, yellow, gray } from "../colors";
-import { TestData, TestResult } from "../types";
-import { Summary } from "./Summary";
+import { bold, magenta, yellow, gray } from "../colors";
+import { TestCase, TestFile, TestSuite } from "../discovery";
+import * as warningFilters from "./warningFilters";
 
-export type Cases<T extends TestData> = T["suites"][keyof T["suites"]]
+export abstract class BaseRenderer {
+  root: string;
+  verbose: boolean;
 
-export abstract class BaseRenderer<T extends TestData> {
-    testResult: TestResult<T>;
-    verbose: boolean;
-    specs: T[];
-    root: string;
-    summary: Summary;
+  allFiles: TestFile[];
+  allSuites: TestSuite[];
+  allCases: TestCase[];
 
-    constructor(testResult: TestResult<T>, root: string, verbose = false) {
-      this.testResult = testResult;
-      this.root = root;
-      this.verbose = verbose;
-      this.specs = this.getSpecs();
-      this.summary = this.getSummary();
+  importFailures: TestFile[];
+  importSuccesses: TestFile[];
+  failedCases: TestCase[];
+
+  constructor(testFiles: TestFile[], root: string, verbose = false) {
+    this.root = root;
+    this.verbose = verbose;
+
+    this.allFiles = testFiles;
+    this.allSuites = this.getSuites();
+    this.allCases = this.getCases();
+
+    this.importFailures = this.getImportFailures();
+    this.importSuccesses = this.getImportSuccesses();
+    this.failedCases = this.getFailedCases();
+  }
+
+  getSuites() {
+    const suites = [];
+    for (const file of this.allFiles) {
+      for (const suite of Object.values(file.suites)) {
+        suites.push(suite);
+      }
     }
+    return suites;
+  }
 
-    abstract getSpecs(): T[];
-    abstract getSummary(): Summary;
-    abstract renderSuite(name: string, suite: Cases<T>, index: number, last: boolean): void
-
-    renderSummary() {
-      const { totalFiles, totalSuites, totalCases } = this.getSummary();
-      console.log([
-        `\nFound ${magenta(totalCases)} cases`,
-        `in ${magenta(totalSuites)} suites`,
-        `over ${magenta(totalFiles)} files.\n`,
-      ].join(" "));
-    }
-
-    renderWarnings() {
-      if (this.testResult.importFailures.length > 0) {
-        const warningGlyph = yellow('⚠')
-        console.log(` ${warningGlyph} Couldn't import ${magenta(this.summary.failedImports)} files:`);
-        for (const { file, error } of this.testResult.importFailures) {
-          console.log(`   - ${magenta(file)}`);
-          console.log(`     ${error.message}`);
+  getCases() {
+    const cases = [];
+    for (const file of this.allFiles) {
+      for (const suite of Object.values(file.suites)) {
+        for (const caseName in suite.cases) {
+          cases.push(suite.cases[caseName]);
         }
       }
     }
+    return cases;
+  }
 
-    renderTestData({ path, suites }: T) {
-      const relativePath = path.replace(this.root, '');
-      console.log(`${gray('┏')} ${magenta(relativePath)}`);
-      const suitesArray = Object.entries(Object.entries(suites))
-      for (const [indexStr, [name, suite]] of suitesArray) {
-        const index = parseInt(indexStr);
-        const last = index === suitesArray.length - 1;
-        this.renderSuite(name, suite, index, last);
-      }
-      console.log("")
-    }
+  getImportSuccesses() {
+    return this.allFiles.filter(file => !file.importError);
+  }
 
-    render() {
-      this.renderSummary();
-      for (const spec of this.testResult.results) {
-        this.renderTestData(spec);
+  getImportFailures() {
+    return this.allFiles.filter(file => file.importError);
+  }
+
+  getFailedCases() {
+    return this.allCases.filter(
+      testCase => testCase.error || !testCase.result
+    );
+  }
+
+  renderSummary() {
+    console.log([
+      `\nFound ${magenta(this.allCases.length)} cases`,
+      `in ${magenta(this.allSuites.length)} suites`,
+      `over ${magenta(this.allFiles.length)} files.\n`,
+    ].join(" "));
+  }
+
+  renderWarnings() {
+    if (this.importFailures.length > 0) {
+      const warningGlyph = yellow('⚠')
+      console.log(` ${warningGlyph} Couldn't import ${magenta(this.importFailures.length)} files:`);
+      for (const file of this.importFailures) {
+        if (file.importError) {
+          let lines = file.importError.split("\n");
+          const filters = Object.values(warningFilters)
+          for (const filter of filters) {
+            const result = filter(lines);
+            if (result) {
+              lines = result;
+            }
+          }
+          console.log(`   - ${magenta(file.path)}`);
+          console.log(`     ${lines.join("\n     ")}`);
+        }
       }
-      if (this.verbose) {
-        this.renderWarnings();
-      }
-      console.log("")
     }
   }
+
+  renderFile(file: TestFile) {
+    const relativePath = file.path.replace(this.root, '');
+    console.log(`${gray('┏')} ${magenta(relativePath)}`);
+    const suitesArray = Object.entries(Object.entries(file.suites))
+    for (const [indexStr, [suiteName, suite]] of suitesArray) {
+      const index = parseInt(indexStr);
+      const last = index === suitesArray.length - 1;
+      this.renderSuite(suite, index, last);
+    }
+    console.log("")
+  }
+
+  renderSuite(testSuite: TestSuite, index: number, lastSuite: boolean) {
+    console.log(`${gray('┃')}   ${bold(testSuite.name)}`);
+    const cases = Object.entries(testSuite.cases);
+    for (const [indexStr, [caseName, testCase]] of Object.entries(cases)) {
+      const index = parseInt(indexStr);
+      const lastCase = index === cases.length - 1;
+      this.renderCase(testCase, index, lastCase, lastSuite);
+    }
+  }
+
+  abstract renderCase(testCase: TestCase, index: number, lastCase: boolean, lastSuite: boolean): void;
+
+  render() {
+    this.renderSummary();
+    for (const file of this.importSuccesses) {
+      this.renderFile(file);
+    }
+    if (this.verbose) {
+      this.renderWarnings();
+    }
+    console.log("")
+  }
+}

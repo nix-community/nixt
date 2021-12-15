@@ -1,9 +1,10 @@
 import path from 'path';
 
 import { NixtCliArgs, parseArgs } from './args';
-import { testSets, testSpecs } from './discovery';
+import { findTests } from './discovery';
 import { ListingRenderer, ResultsRenderer } from './rendering';
-import { TestResult, TestSet, TestSpec } from './types';
+import { runTests } from './running';
+
 
 export class NixtApp {
     args: NixtCliArgs;
@@ -19,16 +20,17 @@ export class NixtApp {
     }
 
     run() {
-        const getter = this.args.list
-            ? testSpecs
-            : testSets;
+      const testFiles = findTests(this.absoluteTestPath);
 
-        const files = getter(this.absoluteTestPath);
+      let renderer;
 
-        const renderer = this.args.list
-            ? new ListingRenderer(files as TestResult<TestSpec>, this.absolutePath, this.args.verbose)
-            : new ResultsRenderer(files as TestResult<TestSet>, this.absolutePath, this.args.verbose);
+      if (!this.args.list) {
+        runTests(testFiles);
+        renderer = new ResultsRenderer(testFiles, this.absolutePath, this.args.verbose);
+      } else {
+        renderer = new ListingRenderer(testFiles, this.absolutePath, this.args.verbose);
+      }
 
-        renderer.render();
+      renderer.render();
     }
 }
