@@ -118,7 +118,7 @@ Two =-v -v= verbose flags implies =--show-trace=.
 ** Listing Tests
 
 To list discovered tests without actually evaluating their cases use the
-`--list/-l` flag:
+=--list/-l= flag:
 
 #+begin_src text
   $ nixt -p ./nix/ -l
@@ -131,7 +131,7 @@ To list discovered tests without actually evaluating their cases use the
         Did you forgot to add the 'nixt' argument to your test expression?
 #+end_src
 
-Or with the `-v/--verbose` flag:
+Or with the =-v/--verbose= flag:
 
 #+begin_src text
   $ nixt -p ./nix/ -l -v
