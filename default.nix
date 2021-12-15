@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs ? import <nixpkgs> {} }:
 
 let
   nixt-pkg = pkgs.callPackage ./cli { inherit pkgs; };
