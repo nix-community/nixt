@@ -35,7 +35,7 @@ Options
   -h, --help          Prints this usage guide
 #+end_src
 
-* Getting Started
+* Running Tests
 
 The =nixt= CLI discovers and runs tests located at =--path/-p=:
 
@@ -111,15 +111,80 @@ Found 14 cases in 8 suites over 3 files.
 
 Two =-v -v= verbose flags implies =--show-trace=.
 
+** Listing Tests
+
+To list discovered tests without actually evaluating their cases use the
+`--list/-l` flag:
+
+#+begin_src text
+  $ nixt -p ./nix/ -l
+
+  Found 14 cases in 8 suites over 3 files.
+
+    ⚠ Couldn't import 1 files:
+      - /home/ldlework/src/nixt/cli/nix/invalid.test.nix
+        Import error: called with unexpected argument 'nixt'
+        Did you forgot to add the 'nixt' argument to your test expression?
+#+end_src
+
+Or with the `-v/--verbose` flag:
+
+#+begin_src text
+  $ nixt -p ./nix/ -l -v
+
+  Found 14 cases in 8 suites over 3 files.
+
+  ┏ /home/ldlework/src/nixt/cli/nix/get-testset.test.nix
+  ┃   mkSuite
+  ┃     - creates correct structure
+  ┃   mkSuites
+  ┃     - always fails
+  ┗     - creates correct structure
+
+  ┏ /home/ldlework/src/nixt/cli/nix/utils.test.nix
+  ┃   broken test
+  ┃     - undefined variable
+  ┃   dirFiles
+  ┃     - empty list for non-existent path
+  ┃     - non-empty list for existing path
+  ┃   findNixFiles
+  ┃     - empty list for non-existent path
+  ┃     - non-empty list for existing path
+  ┃   getDir
+  ┃     - empty list for non-existent path
+  ┃     - non-empty list for existing path
+  ┃   isNix
+  ┃     - false for non-nix files
+  ┃     - true for nix files
+  ┃   isTestSuite
+  ┃     - false for non-test suites
+  ┗     - true for test suites
+  
+    ⚠ Couldn't import 1 files:
+      - /home/ldlework/src/nixt/cli/nix/invalid.test.nix
+        Import error: called with unexpected argument 'nixt'
+        Did you forgot to add the 'nixt' argument to your test expression?
+#+end_src
+
 * Writing Tests
 
-Nixt tests are written in =.nix= files that:
+Nixt tests are written in =.test.nix= files that:
 
-- Has a `.test.nix` extension
 - Contains a function taking attrset args =pkgs= and =nixt=
 - Evaluates to a call of =nixt.mkSuite= or =nixt.mkSuites=
 
+Each suite is composed of one or more cases.
+
+Each case should be an expression that evaluates to a boolean of whether the
+test passes.
+
 *mkSuite*
+
+Args:
+- name: string name of the suite
+- cases: attrset of cases
+
+Defines a single suite of cases for the file.
 
 #+begin_src nix
   { pkgs ? import <nixpkgs> {}, nixt }:
@@ -130,6 +195,12 @@ Nixt tests are written in =.nix= files that:
 #+end_src
 
 *mkSuites*
+
+Args:
+- suites: attrset of suites
+
+Defines multiple suites of cases for the file.
+
 #+begin_src nix
     { pkgs ? import <nixpkgs> {}, nixt }:
 
@@ -142,32 +213,3 @@ Nixt tests are written in =.nix= files that:
       };
     }
 #+end_src
-
-** =nixt.mkSuite=
-=mkSuite= takes two arguments:
-
-- suite name/description
-- attrset of test cases
-
-Each test case maps from case name/description to result.
-
-Test case results should be a boolean specifying whether the case passed or
-failed.
-
-Test cases may also throw a string to provide additional information about a
-failure.
-
-** =nixt.mkSuites=
-=mkSuites= takes a single argument, an attrset that:
-
-- maps suite name => suite
-
-Each suite is an attrset that:
-
-- maps case name => boolean result
-
-Test case results should be a boolean specifying whether the case passed or
-failed.
-
-Test cases may also throw a string to provide additional information about a
-failure.
