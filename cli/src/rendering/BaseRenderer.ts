@@ -74,7 +74,7 @@ export abstract class BaseRenderer {
   renderWarnings() {
     if (this.importFailures.length > 0) {
       const warningGlyph = yellow('⚠')
-      console.log(` ${warningGlyph} Couldn't import ${magenta(this.importFailures.length)} files:`);
+      console.log(`  ${warningGlyph} Couldn't import ${magenta(this.importFailures.length)} files:`);
       for (const file of this.importFailures) {
         if (file.importError) {
           let lines = file.importError.split("\n");
@@ -85,8 +85,8 @@ export abstract class BaseRenderer {
               lines = result;
             }
           }
-          console.log(`   - ${magenta(file.path)}`);
-          console.log(`     ${lines.join("\n     ")}`);
+          console.log(`    - ${magenta(file.path)}`);
+          console.log(`      ${lines.join("\n      ")}`);
         }
       }
     }
@@ -118,12 +118,11 @@ export abstract class BaseRenderer {
 
   render() {
     this.renderSummary();
+    console.log('')
     for (const file of this.importSuccesses) {
       this.renderFile(file);
     }
-    if (this.verbose) {
-      this.renderWarnings();
-    }
+    this.renderWarnings();
     console.log("")
   }
 }

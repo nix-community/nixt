@@ -1,5 +1,5 @@
-import { green, red, gray, bold, italic, yellow } from "../colors";
-import { TestCase } from "../discovery";
+import { green, red, gray, bold, italic, yellow, magenta } from "../colors";
+import { TestCase, TestFile } from "../discovery";
 import { BaseRenderer } from "./BaseRenderer";
 
 
@@ -7,10 +7,29 @@ export class ResultsRenderer extends BaseRenderer {
     renderCase(testCase: TestCase, index: number, lastCase: boolean, lastSuite: boolean) {
       const glyph = lastSuite && lastCase ? '┗' : '┃';
       const mark = testCase.result ? green('✓') : red('✗');
-      console.log(`${gray(glyph)}     ${mark} ${testCase.name}`);
-      if (testCase.error) {
-        this.renderError(testCase.error, lastCase, lastSuite);
+      if (!testCase.result || this.verbose) {
+        console.log(`${gray(glyph)}     ${mark} ${testCase.name}`);
+        if (testCase.error && this.verbose) {
+          this.renderError(testCase.error, lastCase, lastSuite);
+        }
       }
+    }
+
+    renderFile(file: TestFile) {
+      const relativePath = file.path.replace(this.root, '');
+      console.log(`${gray('┏')} ${magenta(relativePath)}`);
+      let suitesArray = Object.entries(Object.entries(file.suites))
+      if (!this.verbose) {
+        suitesArray = suitesArray.filter(([, [, suite]]) =>
+          Object.values(suite.cases).some(testCase => !testCase.result)
+        );
+      }
+      for (const [indexStr, [suiteName, suite]] of suitesArray) {
+        const index = parseInt(indexStr);
+        const last = index === suitesArray.length - 1;
+        this.renderSuite(suite, index, last);
+      }
+      console.log("")
     }
 
     renderError(error: string, lastCase: boolean, lastSuite: boolean) {
@@ -32,5 +51,15 @@ export class ResultsRenderer extends BaseRenderer {
           console.log(`${gray(glyph)}       ${yellow(italic(line))}`);
         }
       }
+    }
+
+    renderSummary() {
+        super.renderSummary();
+        const nFailedCases = this.failedCases.length;
+        let glyph = green('✓');
+        if (nFailedCases > 0) {
+          glyph = red('✗');
+        }
+        console.log(`  ${glyph} ${magenta(nFailedCases)} cases failed.`);
     }
   }
