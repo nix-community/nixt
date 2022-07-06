@@ -1,13 +1,15 @@
 {
   description = "Test-runner for nixlang.";
 
-  outputs = { self, nixpkgs }:
-    let
-      pkgs = import nixpkgs {};
-      nixt-pkg = pkgs.callPackage ./default.nix { inherit pkgs; };
-    in {
+  inputs.fu.url = "github:numtide/flake-utils";
 
-    packages.x86_64-linux.nixt = nixt-pkg;
-    defaultPackage.x86_64-linux = nixt-pkg;
-  };
+  outputs = { self, nixpkgs, fu }:
+    fu.lib.eachSystem [ fu.lib.system.x86_64-linux ] (system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+        nixt-pkg = pkgs.callPackage ./default.nix { inherit pkgs; };
+      in {
+        packages.default = nixt-pkg;
+        devShells.default = import ./cli/shell.nix { inherit pkgs; };
+      });
 }
