@@ -4,7 +4,7 @@ import { parse } from 'ts-command-line-args';
 export interface NixtCliArgs {
     path: string;
     debug: boolean;
-    verbose: boolean;
+    verbose: boolean[];
     list: boolean;
     help: boolean;
 }
@@ -12,7 +12,7 @@ export interface NixtCliArgs {
 export const parseArgs = () => parse<NixtCliArgs>({
     path: { type: String, alias: 'p', defaultOption: true, defaultValue: ".", description: 'Path to the test suite' },
     debug: { type: Boolean, alias: 'd', description: 'Show nixt-developent relevant info' },
-    verbose: { type: Boolean, alias: 'v', description: 'Show additional test info' },
+    verbose: { type: Boolean, alias: 'v', multiple: true, description: 'Show additional test info' },
     list: { type: Boolean, alias: 'l', description: `List, but don't run, tests` },
     help: { type: Boolean, alias: 'h', description: 'Prints this usage guide' },
 },
