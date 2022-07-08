@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@types/node": "^16.11.12",
+    "chokidar": "^3.5.3",
     "colors": "^1.4.0",
     "ts-command-line-args": "^2.2.0"
   }
