@@ -10,9 +10,9 @@ export function nixEval(path: string, options: NixOptions) {
     : [];
 
   const argsString = args.length > 0 ? `${args.join(' ')}` : '';
-  const verboseString = options.verbose || 0 > 1 ? `--show-trace` : '';
+  const traceString = options.trace ? `--show-trace` : '';
   const expression = `import ${fullPath} { ${argsString} }`
-  const command = `nix eval --json --impure ${verboseString} --expr '${expression}'`;
+  const command = `nix eval --json --impure ${traceString} --expr '${expression}'`;
 
   if (options.debug) {
     console.log(command);

@@ -2,7 +2,7 @@
 export type NixOptions = {
   attr?: string;
   strict?: boolean;
-  verbose?: number;
+  trace?: boolean;
   debug?: boolean;
   args?: {};
 }

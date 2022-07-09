@@ -5,8 +5,8 @@ import { TestFile, TestSuite, TestCase } from "./types";
 
 export function findTests(path: string): TestFile[] {
   const files =
-    dirFiles(path)
-      .filter(p => p.endsWith(".test.nix"))
+    dirFiles(path, true)
+      .filter(p => p.endsWith(".test.nix") || p.endsWith(".spec.nix") || p.endsWith(".nixt"))
 
   const testFiles: TestFile[] = [];
 
