@@ -34,9 +34,10 @@ nixt
 Options
 
   -p, --path string   Path to the test suite
-  -d, --debug         Show nixt-developent relevant info
+  -w, --watch         Watch for changes at path
   -v, --verbose       Show additional test info
   -l, --list          List, but don't run, tests
+  -d, --debug         Show nixt-developent relevant info
   -h, --help          Prints this usage guide
 #+end_src
 
