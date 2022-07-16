@@ -1,15 +1,42 @@
 {
-  description = "Test-runner for nixlang.";
+  description = "Test-runner for Nix";
 
-  inputs.fu.url = "github:numtide/flake-utils";
+  inputs = {
+    nixpkgs.url = "nixpkgs";
 
-  outputs = { self, nixpkgs, fu }:
-    fu.lib.eachSystem [ fu.lib.system.x86_64-linux ] (system:
+    flake-utils.url = "github:numtide/flake-utils";
+
+    flake-compat = {
+      url = "github:edolstra/flake-compat";
+      flake = false;
+    };
+  };
+
+  outputs = { self, nixpkgs, flake-utils, flake-compat }:
+    flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        nixt-pkg = pkgs.callPackage ./default.nix { inherit pkgs; };
+        inherit (import ./default.nix { inherit pkgs; }) package shell;
+        packageName = "nixt";
       in {
-        packages.default = nixt-pkg;
-        devShells.default = import ./cli/shell.nix { inherit pkgs; };
+        packages = {
+          default = self.packages.${system}.${packageName};
+          ${packageName} = package;
+        };
+
+        apps = {
+          default = self.apps.${system}.${packageName};
+          ${packageName} = flake-utils.lib.mkApp {
+            name = packageName;
+            drv = package;
+            exePath = "/lib/node_modules/dist/index.js";
+          };
+        };
+
+        devShells.default = shell.overrideAttrs (oldAttrs: {
+          shellHook = oldAttrs.shellHook + ''
+            export PS1='dev:\w > \[$(tput sgr0)\]'
+          '';
+        });
       });
 }
