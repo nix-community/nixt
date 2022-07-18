@@ -4,16 +4,12 @@ with pkgs.lib;
 with (import ./utils.nix { inherit pkgs; });
 
 let
-    _mkSingleSuite = path: name: cases: {
-      inherit path;
-      suites = {
-        "${name}" = cases;
-      };
-    };
+  _mkSingleSuite = path: name: cases: {
+    inherit path;
+    suites = { "${name}" = cases; };
+  };
 
-    _mkSuites = path: suites: {
-      inherit path suites;
-    };
+  _mkSuites = path: suites: { inherit path suites; };
 
 in import path {
   nixt = rec {
