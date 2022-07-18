@@ -29,7 +29,6 @@
           ${packageName} = flake-utils.lib.mkApp {
             name = packageName;
             drv = package;
-            exePath = "/lib/node_modules/dist/index.js";
           };
         };
 
