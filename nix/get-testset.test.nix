@@ -25,6 +25,5 @@ in mkSuites {
         bar = { baz = true; };
       };
     };
-    "always fails" = false;
   };
 }

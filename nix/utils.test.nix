@@ -8,8 +8,6 @@ let
 
   # file evaluates to an attrset of test suites
 in nixt.mkSuites {
-  "broken test" = { "undefined variable" = baz; };
-
   # each suite is top-level attr
   "getDir" = {
     # each case is an attr on the suite
