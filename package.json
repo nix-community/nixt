@@ -9,7 +9,7 @@
     "nixt": "dist/index.js"
   },
   "scripts": {
-    "build": "[ -e \"tsconfig.json\" ] && tsc || echo 0",
+    "build": "if [ -f \"tsconfig.json\" ]; then tsc; fi",
     "build:watch": "tsc -w",
     "preinstall": "npm run build",
     "node2nix": "nix-shell -p node2nix --run 'node2nix -14 -d -l package-lock.json'"

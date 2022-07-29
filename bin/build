@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-# if tsconfig.json exist, run tsc
-if [ -f "tsconfig.json" ]; then
-  tsc
-fi
