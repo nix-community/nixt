@@ -4,6 +4,18 @@ Nixt is a unit-testing tool for Nixlang.
 
 * Installation
 
+** Imperatively
+Using nix-env:
+#+begin_src shell
+$ nix-env -if https://github.com/nix-community/nixt/archive/master.tar.gz
+#+end_src
+
+Using nix profile:
+#+begin_src shell
+$ nix profile install github:nix-community/nixt
+#+end_src
+
+** Declaratively
 Add Nixt as a flake to your configuration:
 
 #+begin_src nix
