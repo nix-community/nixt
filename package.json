@@ -1,6 +1,6 @@
 {
   "name": "nixt",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Test-runner for Nix",
   "author": "Dustin Lacewell",
   "license": "ISC",
@@ -9,7 +9,7 @@
     "nixt": "dist/index.js"
   },
   "scripts": {
-    "build": "realpath tsc && tsc",
+    "build": "[ -e \"tsconfig.json\" ] && tsc || echo 0",
     "build:watch": "tsc -w",
     "preinstall": "npm run build",
     "node2nix": "nix-shell -p node2nix --run 'node2nix -14 -d -l package-lock.json'"
