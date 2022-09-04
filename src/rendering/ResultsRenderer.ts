@@ -58,6 +58,7 @@ export class ResultsRenderer extends BaseRenderer {
         const nFailedCases = this.failedCases.length;
         let glyph = green('✓');
         if (nFailedCases > 0) {
+          process.exitCode = 1;
           glyph = red('✗');
         }
         console.log(`  ${glyph} ${magenta(nFailedCases)} cases failed.`);

@@ -73,6 +73,7 @@ export abstract class BaseRenderer {
 
   renderWarnings() {
     if (this.importFailures.length > 0) {
+      process.exitCode = 1;
       const warningGlyph = yellow('⚠')
       console.log(`  ${warningGlyph} Couldn't import ${magenta(this.importFailures.length)} files:`);
       for (const file of this.importFailures) {
