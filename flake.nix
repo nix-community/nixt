@@ -18,7 +18,8 @@
         pkgs = nixpkgs.legacyPackages.${system};
         inherit (import ./default.nix { inherit pkgs; }) package shell;
         packageName = "nixt";
-      in {
+      in
+      {
         packages = {
           default = self.packages.${system}.${packageName};
           ${packageName} = package;

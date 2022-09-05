@@ -1,5 +1,8 @@
 import path from 'path';
 
+import { injectable } from 'inversify';
+import { INixtApp } from './interfaces';
+
 import { NixtCliArgs, parseArgs } from './args';
 import { findTests } from './discovery';
 import { ListingRenderer, ResultsRenderer } from './rendering';
@@ -7,7 +10,8 @@ import { runTests } from './running';
 import chokidar from 'chokidar';
 
 
-export class NixtApp {
+@injectable()
+export class NixtApp implements INixtApp {
   args: NixtCliArgs;
   absoluteTestPath: string;
   absolutePath: string;
