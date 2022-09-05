@@ -1,27 +1,27 @@
 import path from 'path';
 
-import { injectable } from 'inversify';
-import { INixtApp } from './interfaces';
+import { inject, injectable } from 'inversify';
+import { IArgParser, ICliArgs, INixtApp } from './interfaces';
 
-import { NixtCliArgs, parseArgs } from './args';
 import { findTests } from './discovery';
 import { ListingRenderer, ResultsRenderer } from './rendering';
 import { runTests } from './running';
 import chokidar from 'chokidar';
 
-
 @injectable()
 export class NixtApp implements INixtApp {
-  args: NixtCliArgs;
-  absoluteTestPath: string;
-  absolutePath: string;
-  nixPath: string;
+  private _argParser: IArgParser
+  private args: ICliArgs;
+  private absoluteTestPath: string;
+  private absolutePath: string;
 
-  constructor() {
-    this.args = parseArgs();
+  constructor(
+    @inject(IArgParser) argParser: IArgParser
+  ) {
+    this._argParser = argParser;
+    this.args = this._argParser.run();
     this.absoluteTestPath = path.resolve(this.args.path);
     this.absolutePath = path.resolve(__filename);
-    this.nixPath = path.resolve(this.absolutePath, '../../nix');
   }
 
   run() {
