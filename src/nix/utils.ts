@@ -1,6 +1,5 @@
 import path from "path";
 
-
 export function nixPath(filePath: string) {
   return path.join(__dirname, "..", "..", "nix", filePath);
 }

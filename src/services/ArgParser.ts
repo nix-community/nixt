@@ -13,6 +13,7 @@ export class ArgParser implements IArgParser {
             watch: { type: Boolean, alias: 'w', optional: true, description: 'Watch for changes at path' },
             verbose: { type: Boolean, alias: 'v', optional: true, multiple: true, defaultValue: [false, false], description: 'Show additional test info' },
             list: { type: Boolean, alias: 'l', optional: true, description: 'List tests without running them' },
+            noRecurse: { type: Boolean, optional: true, description: 'Do not search path recursively' },
             debug: { type: Boolean, alias: 'd', optional: true, description: 'Show debug messages' },
             help: { type: Boolean, alias: 'h', optional: true, description: 'Prints this usage guide' },
         },

@@ -44,7 +44,6 @@ export class App implements IApp {
       if (!this.args.list) {
         runTests(testFiles, this.args.verbose[1]);
         renderer = new ResultsRenderer(testFiles, this.absolutePath, this.args.verbose[0]);
-        console.log("List is true");
       } else {
         renderer = new ListingRenderer(testFiles, this.absolutePath, this.args.verbose[0]);
       }

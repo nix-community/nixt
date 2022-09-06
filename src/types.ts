@@ -5,8 +5,24 @@ export type CliArgs = {
     watch: boolean;
     verbose: boolean[];
     list: boolean;
+    noRecurse: boolean;
     debug: boolean;
     help: boolean;
+}
+
+export type NixOptions = {
+    attr?: string;
+    strict?: boolean;
+    trace?: boolean;
+    debug?: boolean;
+    args?: {};
+}
+
+export type TestSpec = {
+    path: Path;
+    suites: {
+        [key: string]: string[];
+    };
 }
 
 export class TestCase {
@@ -39,5 +55,3 @@ export class TestFile {
         this.suites = {};
     }
 }
-
-export type TestFiles = TestFile[]

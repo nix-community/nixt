@@ -1,6 +1,6 @@
 {
   "name": "nixt",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Test-runner for Nix",
   "author": "Dustin Lacewell",
   "license": "ISC",

@@ -1,15 +1,16 @@
 import { injectable } from "inversify";
 import { ITestRenderer } from "../interfaces";
-import { TestFiles } from "../types";
+
+import { CliArgs, TestFile } from "../types";
 
 @injectable()
 export class TestRenderer implements ITestRenderer {
-    result(testFiles: TestFiles): void {
+    result(args: CliArgs, testFiles: TestFile[]) {
         console.log("TestRenderer.result() was called!")
         return
     }
 
-    list(testFiles: TestFiles): void {
+    list(args: CliArgs, testFiles: TestFile[]) {
         console.log("TestRenderer.list() was called")
         return
     }
