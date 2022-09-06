@@ -13,21 +13,21 @@ export abstract class IArgParser {
 
 @injectable()
 export abstract class ITestFinder {
-    abstract run(path: CliArgs["path"]): TestFiles;
+    abstract run(args: CliArgs): TestFiles;
 }
 
 @injectable()
 export abstract class ITestRunner {
-    abstract run(testFiles: TestFiles): void;
+    abstract run(args: CliArgs, testFiles: TestFiles): void;
 }
 
 @injectable()
 export abstract class ITestRenderer {
-    abstract result(testFiles: TestFiles): void;
-    abstract list(testFiles: TestFiles): void;
+    abstract result(args: CliArgs, testFiles: TestFiles): void;
+    abstract list(args: CliArgs, testFiles: TestFiles): void;
 }
 
 @injectable()
 export abstract class ITestService {
-    abstract run(listArg: CliArgs["list"], verboseArg: CliArgs["verbose"]): void;
+    abstract run(args: CliArgs): void;
 }

@@ -12,11 +12,12 @@ import { runTests } from '../running';
 
 @injectable()
 export class App implements IApp {
-  private absolutePath: string;
   private _argParser: IArgParser;
+  private _testService: ITestService;
+
+  private absolutePath: string;
   private args: CliArgs;
   private absoluteTestPath: string;
-  private _testService: ITestService;
 
   constructor(
     @inject(IArgParser) argParser: IArgParser,
@@ -31,7 +32,7 @@ export class App implements IApp {
 
   run() {
     const test = () => {
-      this._testService.run(this.args.list, this.args.verbose);
+      this._testService.run(this.args);
     }
 
     // TODO rm, use test instead
