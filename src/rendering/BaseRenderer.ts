@@ -1,5 +1,5 @@
 import { bold, magenta, yellow, gray } from "../colors";
-import { TestCase, TestFile, TestSuite } from "../discovery";
+import { TestCase, TestFile, TestSuite } from "../types";
 import * as warningFilters from "./warningFilters";
 
 export abstract class BaseRenderer {

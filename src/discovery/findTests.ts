@@ -1,7 +1,7 @@
 import { getTestSpec } from "../nix";
 import { dirFiles } from "./dirFiles";
-import { TestFile, TestSuite, TestCase } from "./types";
 
+import { TestCase, TestFile, TestSuite } from "../types";
 
 export function findTests(path: string): TestFile[] {
   const files =

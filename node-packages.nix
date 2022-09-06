@@ -584,7 +584,7 @@ let
   args = {
     name = "nixt";
     packageName = "nixt";
-    version = "0.2.5";
+    version = "0.2.6";
     src = ./.;
     dependencies = [
       sources."@cspotcode/source-map-support-0.8.1"

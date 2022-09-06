@@ -1,6 +1,5 @@
-import { TestFile } from "../discovery/types";
 import { getTestCase } from "../nix";
-
+import { TestFile } from "../types";
 
 export function runTests(testFiles: TestFile[], traceOpt: boolean) {
   for (const testFile of testFiles) {
