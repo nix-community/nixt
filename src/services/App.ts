@@ -1,17 +1,17 @@
 import path from 'path';
-
-import { inject, injectable } from 'inversify';
-import { IArgParser, INixtApp, ITestService } from './interfaces';
-
-import { CliArgs } from './types';
-
-import { findTests } from './discovery';
-import { ListingRenderer, ResultsRenderer } from './rendering';
-import { runTests } from './running';
 import chokidar from 'chokidar';
 
+import { inject, injectable } from 'inversify';
+import { IApp, IArgParser, ITestService } from '../interfaces';
+
+import { CliArgs } from '../types';
+
+import { findTests } from '../discovery';
+import { ListingRenderer, ResultsRenderer } from '../rendering';
+import { runTests } from '../running';
+
 @injectable()
-export class NixtApp implements INixtApp {
+export class App implements IApp {
   private absolutePath: string;
   private _argParser: IArgParser;
   private args: CliArgs;
@@ -34,6 +34,7 @@ export class NixtApp implements INixtApp {
       this._testService.run(this.args.list, this.args.verbose);
     }
 
+    // TODO rm, use test instead
     const go = () => {
       const testFiles = findTests(this.absoluteTestPath);
 

@@ -2,7 +2,7 @@ import { injectable } from 'inversify';
 import { CliArgs, TestFiles } from './types';
 
 @injectable()
-export abstract class INixtApp {
+export abstract class IApp {
     abstract run(): void;
 }
 

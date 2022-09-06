@@ -1,9 +1,9 @@
 import { parse } from 'ts-command-line-args';
 
 import { injectable } from 'inversify';
-import { IArgParser } from './interfaces';
+import { IArgParser } from '../interfaces';
 
-import { CliArgs } from './types';
+import { CliArgs } from '../types';
 
 @injectable()
 export class ArgParser implements IArgParser {
