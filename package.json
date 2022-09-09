@@ -1,6 +1,6 @@
 {
   "name": "nixt",
-  "version": "0.2.3",
+  "version": "0.2.7",
   "description": "Test-runner for Nix",
   "author": "Dustin Lacewell",
   "license": "ISC",
@@ -12,7 +12,7 @@
     "build": "if [ -f \"tsconfig.json\" ]; then tsc; fi",
     "build:watch": "tsc -w",
     "preinstall": "npm run build",
-    "node2nix": "nix-shell -p node2nix --run 'node2nix -14 -d -l package-lock.json'"
+    "node2nix": "nix-shell -p node2nix --run 'rm -rf node_modules; node2nix -14 -d -l package-lock.json'"
   },
   "devDependencies": {
     "@types/node": "^16.11.12",
@@ -22,6 +22,8 @@
   "dependencies": {
     "chokidar": "^3.5.3",
     "colors": "^1.4.0",
+    "inversify": "^6.0.1",
+    "reflect-metadata": "^0.1.13",
     "ts-command-line-args": "^2.2.0"
   }
 }

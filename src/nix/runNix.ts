@@ -1,7 +1,6 @@
 import { execSync } from "child_process";
-import { NixOptions } from "./types";
+import { NixOptions } from "../types";
 import { generateCallArgs, nixPath } from "./utils";
-
 
 export function nixEval(path: string, options: NixOptions) {
   const fullPath = nixPath(path);

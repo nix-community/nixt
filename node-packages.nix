@@ -76,22 +76,22 @@ let
         sha512 = "yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==";
       };
     };
-    "@types/node-16.11.45" = {
+    "@types/node-16.11.57" = {
       name = "_at_types_slash_node";
       packageName = "@types/node";
-      version = "16.11.45";
+      version = "16.11.57";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@types/node/-/node-16.11.45.tgz";
-        sha512 = "3rKg/L5x0rofKuuUt5zlXzOnKyIHXmIu5R8A0TuNDMF2062/AOIDBciFIjToLEJ/9F9DzkHNot+BpNsMI1OLdQ==";
+        url = "https://registry.npmjs.org/@types/node/-/node-16.11.57.tgz";
+        sha512 = "diBb5AE2V8h9Fs9zEDtBwSeLvIACng/aAkdZ3ujMV+cGuIQ9Nc/V+wQqurk9HJp8ni5roBxQHW21z/ZYbGDivg==";
       };
     };
-    "acorn-8.7.1" = {
+    "acorn-8.8.0" = {
       name = "acorn";
       packageName = "acorn";
-      version = "8.7.1";
+      version = "8.8.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/acorn/-/acorn-8.7.1.tgz";
-        sha512 = "Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==";
+        url = "https://registry.npmjs.org/acorn/-/acorn-8.8.0.tgz";
+        sha512 = "QOxyigPVrpZ2GXT+PFyZTl6TtOFc5egxHIP9IlQ+RbupQuX4RkT/Bee4/kQuC02Xkzg84JcT7oLYtDIQxp+v7w==";
       };
     };
     "acorn-walk-8.2.0" = {
@@ -355,6 +355,15 @@ let
         sha512 = "EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==";
       };
     };
+    "inversify-6.0.1" = {
+      name = "inversify";
+      packageName = "inversify";
+      version = "6.0.1";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/inversify/-/inversify-6.0.1.tgz";
+        sha512 = "B3ex30927698TJENHR++8FfEaJGqoWOgI6ZY5Ht/nLUsFCwHn6akbwtnUAPCgUepAnTpe2qHxhDNjoKLyz6rgQ==";
+      };
+    };
     "is-binary-path-2.1.0" = {
       name = "is-binary-path";
       packageName = "is-binary-path";
@@ -445,6 +454,15 @@ let
         sha512 = "EJ4UNY/U1t2P/2k6oqotuX2Cc3T6nxJwsM0N0asT7dhrtH1ltUxDn4NalSYmPE2rCkVpcf/X6R0wDwcFpzhd4w==";
       };
     };
+    "reflect-metadata-0.1.13" = {
+      name = "reflect-metadata";
+      packageName = "reflect-metadata";
+      version = "0.1.13";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/reflect-metadata/-/reflect-metadata-0.1.13.tgz";
+        sha512 = "Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==";
+      };
+    };
     "string-format-2.0.0" = {
       name = "string-format";
       packageName = "string-format";
@@ -508,13 +526,13 @@ let
         sha512 = "NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==";
       };
     };
-    "typescript-4.7.4" = {
+    "typescript-4.8.2" = {
       name = "typescript";
       packageName = "typescript";
-      version = "4.7.4";
+      version = "4.8.2";
       src = fetchurl {
-        url = "https://registry.npmjs.org/typescript/-/typescript-4.7.4.tgz";
-        sha512 = "C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==";
+        url = "https://registry.npmjs.org/typescript/-/typescript-4.8.2.tgz";
+        sha512 = "C0I1UsrrDHo2fYI5oaCGbSejwX4ch+9Y5jTQELvovfmFkK3HHSZJB8MSJcWLmCUBzQBchCrZ9rMRV6GuNrvGtw==";
       };
     };
     "typical-4.0.0" = {
@@ -566,7 +584,7 @@ let
   args = {
     name = "nixt";
     packageName = "nixt";
-    version = "0.2.3";
+    version = "0.2.7";
     src = ./.;
     dependencies = [
       sources."@cspotcode/source-map-support-0.8.1"
@@ -577,8 +595,8 @@ let
       sources."@tsconfig/node12-1.0.11"
       sources."@tsconfig/node14-1.0.3"
       sources."@tsconfig/node16-1.0.3"
-      sources."@types/node-16.11.45"
-      sources."acorn-8.7.1"
+      sources."@types/node-16.11.57"
+      sources."acorn-8.8.0"
       sources."acorn-walk-8.2.0"
       sources."ansi-styles-4.3.0"
       sources."anymatch-3.1.2"
@@ -613,6 +631,7 @@ let
       sources."fsevents-2.3.2"
       sources."glob-parent-5.1.2"
       sources."has-flag-4.0.0"
+      sources."inversify-6.0.1"
       sources."is-binary-path-2.1.0"
       sources."is-extglob-2.1.1"
       sources."is-glob-4.0.3"
@@ -623,6 +642,7 @@ let
       sources."picomatch-2.3.1"
       sources."readdirp-3.6.0"
       sources."reduce-flatten-2.0.0"
+      sources."reflect-metadata-0.1.13"
       sources."string-format-2.0.0"
       sources."supports-color-7.2.0"
       (sources."table-layout-1.0.2" // {
@@ -634,7 +654,7 @@ let
       sources."to-regex-range-5.0.1"
       sources."ts-command-line-args-2.3.1"
       sources."ts-node-10.9.1"
-      sources."typescript-4.7.4"
+      sources."typescript-4.8.2"
       sources."typical-4.0.0"
       sources."v8-compile-cache-lib-3.0.1"
       (sources."wordwrapjs-4.0.1" // {
