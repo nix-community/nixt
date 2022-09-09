@@ -1,5 +1,3 @@
-
-
 export function forgotNixtArg(lines: string[]) {
   if (lines.length > 0) {
     if (lines.some(l => l.includes(`called with unexpected argument 'nixt'`))) {

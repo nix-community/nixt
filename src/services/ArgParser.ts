@@ -7,7 +7,7 @@ import { CliArgs } from '../types';
 
 @injectable()
 export class ArgParser implements IArgParser {
-    run(): CliArgs {
+    public run(): CliArgs {
         const parsedArgs = parse<CliArgs>({
             path: { type: String, alias: 'p', optional: true, defaultOption: true, defaultValue: ".", description: 'Path to the test suite' },
             watch: { type: Boolean, alias: 'w', optional: true, description: 'Watch for changes at path' },

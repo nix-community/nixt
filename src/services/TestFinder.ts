@@ -10,13 +10,13 @@ import { CliArgs, Path, TestCase, TestFile, TestSpec, TestSuite } from "../types
 export class TestFinder implements ITestFinder {
     private _nixService: INixService;
 
-    constructor(
+    public constructor(
         @inject(INixService) nixService: INixService
     ) {
         this._nixService = nixService;
     }
 
-    getFiles(args: CliArgs, path: Path) {
+    private getFiles(args: CliArgs, path: Path): Path[] {
         if (!fs.existsSync(path)) {
             throw new Error(`Path ${path} does not exist!`);
         }
@@ -24,6 +24,7 @@ export class TestFinder implements ITestFinder {
         const stats = fs.statSync(path);
 
         if (stats.isFile()) {
+            if (args.debug) console.log(`Found: ${path}`);
             return [path];
         }
 
@@ -31,10 +32,9 @@ export class TestFinder implements ITestFinder {
             const read = fs.readdirSync(path).map(file => `${path}/${file}`);
 
             let files = read.filter(file => fs.statSync(file).isFile());
+            const dirs = read.filter(file => fs.statSync(file).isDirectory());
 
-            const dirs = read.filter(file => fs.statSync(file).isDirectory);
-
-            if (args.noRecurse == false && dirs.length > 0) {
+            if (!args.noRecurse && dirs.length > 0) {
                 const newFiles = dirs.map(dir => this.getFiles(args, dir)).flat();
                 files = files.concat(newFiles);
             }
@@ -45,18 +45,16 @@ export class TestFinder implements ITestFinder {
         return []
     }
 
-    run(args: CliArgs) {
+    public async run(args: CliArgs, abPath: Path): Promise<TestFile[]> {
         const getTestSpec = (f: Path): TestSpec => {
             return this._nixService.eval("get-testspec.nix", { args: { path: resolve(f), } });
         }
 
-        const fileExtPred = (p: Path) => {
-            p.endsWith(".test.nix")
+        const files = this.getFiles(args, abPath)
+            .filter(p =>
+                p.endsWith(".test.nix")
                 || p.endsWith(".spec.nix")
-                || p.endsWith(".nixt");
-        }
-
-        const files = this.getFiles(args, args.path).filter(p => fileExtPred(p));
+                || p.endsWith(".nixt"));
 
         const testFiles: TestFile[] = [];
 

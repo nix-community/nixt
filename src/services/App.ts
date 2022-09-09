@@ -2,53 +2,47 @@ import path from 'path';
 import chokidar from 'chokidar';
 
 import { inject, injectable } from 'inversify';
-import { IApp, IArgParser, ITestService } from '../interfaces';
+import { IApp, IArgParser, IRenderService, ITestFinder, ITestRunner } from '../interfaces';
 
 import { CliArgs } from '../types';
-
-import { findTests } from '../discovery';
-import { ListingRenderer, ResultsRenderer } from '../rendering';
-import { runTests } from '../running';
 
 @injectable()
 export class App implements IApp {
   private _argParser: IArgParser;
-  private _testService: ITestService;
+  private _testRunner: ITestRunner;
+  private _renderService: IRenderService;
+  private _testFinder: ITestFinder;
 
-  private absolutePath: string;
   private args: CliArgs;
   private absoluteTestPath: string;
 
-  constructor(
+  public constructor(
     @inject(IArgParser) argParser: IArgParser,
-    @inject(ITestService) testService: ITestService
+    @inject(ITestRunner) testRunner: ITestRunner,
+    @inject(IRenderService) renderService: IRenderService,
+    @inject(ITestFinder) testFinder: ITestFinder
   ) {
-    this.absolutePath = path.resolve(__filename);
     this._argParser = argParser;
+    this._testRunner = testRunner;
+    this._renderService = renderService;
+    this._testFinder = testFinder;
+
     this.args = this._argParser.run();
     this.absoluteTestPath = path.resolve(this.args.path);
-    this._testService = testService;
   }
 
-  run() {
-    const test = () => {
-      this._testService.run(this.args);
-    }
-
-    // TODO rm, use test instead
-    const go = () => {
-      const testFiles = findTests(this.absoluteTestPath);
-
-      let renderer;
+  public run() {
+    const test = async () => {
+      if (this.args.debug) console.log("Finding files!");
+      const testFiles = await this._testFinder.run(this.args, this.absoluteTestPath);
 
       if (!this.args.list) {
-        runTests(testFiles, this.args.verbose[1]);
-        renderer = new ResultsRenderer(testFiles, this.absolutePath, this.args.verbose[0]);
-      } else {
-        renderer = new ListingRenderer(testFiles, this.absolutePath, this.args.verbose[0]);
+        if (this.args.debug) console.log("Running tests!");
+        await this._testRunner.run(this.args, testFiles);
       }
 
-      renderer.render();
+      if (this.args.debug) console.log("Rendering!")
+      this._renderService.run(this.args, testFiles, this.absoluteTestPath);
     }
 
     if (this.args.watch) {
@@ -56,9 +50,11 @@ export class App implements IApp {
       chokidar.watch(this.args.path, { ignoreInitial: true }).on('all', (event, path) => {
         console.clear();
         if (this.args.debug) console.log(event, path);
-        go()
+
+        test()
       });
     }
-    go();
+
+    test()
   }
 }

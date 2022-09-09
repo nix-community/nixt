@@ -13,27 +13,20 @@ export abstract class IArgParser {
 
 @injectable()
 export abstract class ITestFinder {
-    abstract getFiles(args: CliArgs, path: Path): Path[];
-    abstract run(args: CliArgs): TestFile[];
+    abstract run(args: CliArgs, path: Path): Promise<TestFile[]>;
 }
 
 @injectable()
 export abstract class ITestRunner {
-    abstract run(args: CliArgs, testFiles: TestFile[]): void;
-}
-
-@injectable()
-export abstract class ITestRenderer {
-    abstract result(args: CliArgs, testFiles: TestFile[]): void;
-    abstract list(args: CliArgs, testFiles: TestFile[]): void;
-}
-
-@injectable()
-export abstract class ITestService {
-    abstract run(args: CliArgs): void;
+    abstract run(args: CliArgs, testFiles: TestFile[]): Promise<void>;
 }
 
 @injectable()
 export abstract class INixService {
     abstract eval(path: Path, options: NixOptions): any;
+}
+
+@injectable()
+export abstract class IRenderService {
+    abstract run(args: CliArgs, testFiles: TestFile[], path: Path): void;
 }

@@ -18,7 +18,7 @@ const generateCallArgs = (a: {}) => {
 
 @injectable()
 export class NixService implements INixService {
-    eval(path: Path, options: NixOptions) {
+    public eval(path: Path, options: NixOptions) {
         const fullPath = nixPath(path);
         const args = options.args ? generateCallArgs(options.args) : [];
 
