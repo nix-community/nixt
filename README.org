@@ -177,7 +177,7 @@ Or with the =-v/--verbose= flag:
   ┃   isTestSuite
   ┃     - false for non-test suites
   ┗     - true for test suites
-  
+
     ⚠ Couldn't import 1 files:
       - /home/ldlework/src/nixt/cli/nix/invalid.test.nix
         Import error: called with unexpected argument 'nixt'

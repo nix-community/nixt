@@ -33,10 +33,6 @@
           };
         };
 
-        devShells.default = shell.overrideAttrs (oldAttrs: {
-          shellHook = oldAttrs.shellHook + ''
-            export PS1='dev:\w > \[$(tput sgr0)\]'
-          '';
-        });
+        devShells.default = shell;
       });
 }

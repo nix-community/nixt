@@ -1,1 +1,1 @@
-export * from './RenderService';
+export * from './RenderService.js';

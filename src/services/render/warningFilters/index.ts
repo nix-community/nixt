@@ -1,1 +1,1 @@
-export * from './forgotNixtArg';
+export * from './forgotNixtArg.js';

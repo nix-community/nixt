@@ -3,8 +3,8 @@
 import "reflect-metadata";
 
 import { Container } from "inversify";
-import { IApp } from "./interfaces"
-import { bindings } from "./bindings";
+import { IApp } from "./interfaces.js";
+import { bindings } from "./bindings.js";
 
 async function init() {
   const container = new Container();

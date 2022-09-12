@@ -1,0 +1,11 @@
+root = true
+
+[*]
+max_line_length = 100
+trim_trailing_whitespace = true
+end_of_line = lf
+insert_final_newline = true
+
+[*.{nix,ts,json}]
+indent_style = space
+indent_size = 2

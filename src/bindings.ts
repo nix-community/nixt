@@ -1,15 +1,29 @@
 import { AsyncContainerModule, interfaces } from 'inversify';
 
-import { IApp, IArgParser, INixService, IRenderService, ITestFinder, ITestRunner } from './interfaces';
-import { App, ArgParser, NixService, RenderService, TestFinder, TestRunner } from './services';
+import {
+  IApp,
+  IArgParser,
+  INixService,
+  IRenderService,
+  ITestFinder,
+  ITestRunner
+} from './interfaces.js';
+import {
+  App,
+  ArgParser,
+  NixService,
+  RenderService,
+  TestFinder,
+  TestRunner
+} from './services/index.js';
 
 export const bindings = new AsyncContainerModule(
-    async (bind: interfaces.Bind) => {
-        bind(IArgParser).to(ArgParser);
-        bind(ITestFinder).to(TestFinder);
-        bind(ITestRunner).to(TestRunner);
-        bind(IRenderService).to(RenderService);
-        bind(INixService).to(NixService);
-        bind(IApp).to(App);
-    }
+  async (bind: interfaces.Bind) => {
+    bind(IArgParser).to(ArgParser);
+    bind(ITestFinder).to(TestFinder);
+    bind(ITestRunner).to(TestRunner);
+    bind(IRenderService).to(RenderService);
+    bind(INixService).to(NixService);
+    bind(IApp).to(App);
+  }
 )

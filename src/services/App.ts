@@ -1,10 +1,8 @@
-import path from 'path';
 import chokidar from 'chokidar';
 
 import { inject, injectable } from 'inversify';
-import { IApp, IArgParser, IRenderService, ITestFinder, ITestRunner } from '../interfaces';
-
-import { CliArgs } from '../types';
+import { IApp, IArgParser, IRenderService, ITestFinder, ITestRunner } from '../interfaces.js';
+import { CliArgs } from '../types.js';
 
 @injectable()
 export class App implements IApp {
@@ -14,7 +12,6 @@ export class App implements IApp {
   private _testFinder: ITestFinder;
 
   private args: CliArgs;
-  private absoluteTestPath: string;
 
   public constructor(
     @inject(IArgParser) argParser: IArgParser,
@@ -28,13 +25,12 @@ export class App implements IApp {
     this._testFinder = testFinder;
 
     this.args = this._argParser.run();
-    this.absoluteTestPath = path.resolve(this.args.path);
   }
 
   public run() {
     const test = async () => {
       if (this.args.debug) console.log("Finding files!");
-      const testFiles = await this._testFinder.run(this.args, this.absoluteTestPath);
+      const testFiles = await this._testFinder.run(this.args);
 
       if (!this.args.list) {
         if (this.args.debug) console.log("Running tests!");
@@ -42,19 +38,20 @@ export class App implements IApp {
       }
 
       if (this.args.debug) console.log("Rendering!")
-      this._renderService.run(this.args, testFiles, this.absoluteTestPath);
+      this._renderService.run(this.args, testFiles);
     }
 
     if (this.args.watch) {
       console.clear();
-      chokidar.watch(this.args.path, { ignoreInitial: true }).on('all', (event, path) => {
-        console.clear();
-        if (this.args.debug) console.log(event, path);
-
-        test()
-      });
+      chokidar.watch(this.args.paths, { ignoreInitial: true })
+        .on('all', (event: string, path: string) => {
+          console.clear();
+          if (this.args.debug) console.log(event, path);
+          test()
+        });
     }
 
     test()
+    return
   }
 }

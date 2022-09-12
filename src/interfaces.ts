@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { CliArgs, NixOptions, Path, TestFile } from './types';
+import { CliArgs, NixOptions, Path, TestFile } from './types.js';
 
 @injectable()
 export abstract class IApp {
@@ -13,7 +13,7 @@ export abstract class IArgParser {
 
 @injectable()
 export abstract class ITestFinder {
-    abstract run(args: CliArgs, path: Path): Promise<TestFile[]>;
+    abstract run(args: CliArgs): Promise<TestFile[]>;
 }
 
 @injectable()
@@ -28,5 +28,5 @@ export abstract class INixService {
 
 @injectable()
 export abstract class IRenderService {
-    abstract run(args: CliArgs, testFiles: TestFile[], path: Path): void;
+    abstract run(args: CliArgs, testFiles: TestFile[]): void;
 }

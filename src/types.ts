@@ -1,11 +1,11 @@
 export type Path = string;
 
 export type CliArgs = {
-    path: Path;
+    paths: Path[];
     watch: boolean;
     verbose: boolean[];
     list: boolean;
-    noRecurse: boolean;
+    recurse: boolean;
     debug: boolean;
     help: boolean;
 }

@@ -7,4 +7,5 @@ export function forgotNixtArg(lines: string[]) {
       ]
     }
   }
+  return [];
 }
