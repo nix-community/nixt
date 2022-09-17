@@ -47,6 +47,7 @@ export class RenderService implements IRenderService {
     private result(c: TestCase, lastC: boolean, lastS: boolean): void {
         let glyph: string;
         if (c.error) {
+            process.exitCode = 1
             glyph = this.args.verbose[0] ? '┃' : '┗'
         } else {
             glyph = lastC && lastS ? '┗' : '┃';
