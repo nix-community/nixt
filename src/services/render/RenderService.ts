@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
 import { IRenderService } from "../../interfaces.js";
-import { CliArgs, Path, TestCase, TestFile, TestSuite } from "../../types.js";
+import { CliArgs, TestCase, TestFile, TestSuite } from "../../types.js";
 
 import colors from "colors";
 import * as warningFilters from './warningFilters/index.js'
