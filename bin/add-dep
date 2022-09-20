@@ -1,7 +1,0 @@
-#!/usr/bin/env
-
-npx add-dependency $@
-
-rm -fr default.nix node-env.nix node-packages.nix node_modules package-lock.json
-
-nix-shell -p 'nodePackages.node2nix' --run 'node2nix package.json'

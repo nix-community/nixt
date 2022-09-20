@@ -11,7 +11,8 @@ let
 
   _mkSuites = path: suites: { inherit path suites; };
 
-in import path {
+in
+import path {
   nixt = rec {
     mkSuite = _mkSingleSuite path;
     mkSuites = _mkSuites path;
