@@ -2,8 +2,8 @@ import fs from 'fs';
 import { resolve } from 'path';
 
 import { inject, injectable } from "inversify";
-import { INixService, ITestFinder } from "../interfaces.js";
-import { CliArgs, Path, TestCase, TestFile, TestSpec, TestSuite } from "../types.js";
+import { INixService, ITestFinder } from "../../interfaces.js";
+import { CliArgs, Path, TestCase, TestFile, TestSpec, TestSuite } from "../../types.js";
 
 @injectable()
 export class TestFinder implements ITestFinder {

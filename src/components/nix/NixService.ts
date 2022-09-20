@@ -2,8 +2,8 @@ import path from "path";
 import { execSync } from "child_process";
 
 import { injectable } from "inversify";
-import { INixService } from "../interfaces.js";
-import { NixOptions, Path } from "../types.js";
+import { INixService } from "../../interfaces.js";
+import { NixOptions, Path } from "../../types.js";
 
 @injectable()
 export class NixService implements INixService {

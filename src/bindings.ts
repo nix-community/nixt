@@ -9,13 +9,13 @@ import {
   ITestRunner
 } from './interfaces.js';
 import {
-  App,
   ArgParser,
   NixService,
   RenderService,
   TestFinder,
   TestRunner
-} from './services/index.js';
+} from './components/index.js';
+import { App } from './App.js';
 
 export const bindings = new AsyncContainerModule(
   async (bind: interfaces.Bind) => {

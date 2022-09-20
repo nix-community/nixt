@@ -1,8 +1,8 @@
 import { resolve } from "path";
 
 import { inject, injectable } from "inversify";
-import { INixService, ITestRunner } from "../interfaces.js";
-import { CliArgs, NixOptions, Path, TestCase, TestFile, TestSuite } from "../types.js";
+import { INixService, ITestRunner } from "../../interfaces.js";
+import { CliArgs, NixOptions, Path, TestCase, TestFile, TestSuite } from "../../types.js";
 
 @injectable()
 export class TestRunner implements ITestRunner {

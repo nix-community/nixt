@@ -1,8 +1,8 @@
 import chokidar from 'chokidar';
 
 import { inject, injectable } from 'inversify';
-import { IApp, IArgParser, IRenderService, ITestFinder, ITestRunner } from '../interfaces.js';
-import { CliArgs } from '../types.js';
+import { IApp, IArgParser, IRenderService, ITestFinder, ITestRunner } from './interfaces.js';
+import { CliArgs } from './types.js';
 
 @injectable()
 export class App implements IApp {
