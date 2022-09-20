@@ -47,6 +47,7 @@ export class RenderService implements IRenderService {
   private list(c: TestCase, lastC: boolean, lastS: boolean): void {
     const glyph = lastC && lastS ? '┗' : '┃';
     console.log(`${colors.gray(glyph)}   - ${c.name}`)
+
     return
   }
 
@@ -54,11 +55,9 @@ export class RenderService implements IRenderService {
     let glyph: string;
     if (c.error) {
       process.exitCode = 1
-      glyph = args.verbose[0] ? '┃' : '┗'
-    } else {
-      glyph = lastC && lastS ? '┗' : '┃';
     }
 
+    glyph = lastS && lastC && !c.error ? '┗' : '┃';
     const mark = c.result ? colors.green('✓') : colors.red('✗');
     if (!c.result || args.verbose[0]) {
       console.log(`${colors.gray(glyph)}     ${mark} ${c.name}`);
