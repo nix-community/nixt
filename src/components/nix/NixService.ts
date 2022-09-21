@@ -9,7 +9,7 @@ import { NixOptions, Path } from "../../types.js";
 export class NixService implements INixService {
   public eval(file: Path, options: NixOptions) {
     const nixPath = (f: Path) => {
-      return path.join(import.meta.url.replace("file:", ""), "..", "..", "..", "nix", f);
+      return path.join(import.meta.url.replace("file:", ""), "..", "..", "..", "..", "nix", f);
     }
 
     const generateCallArgs = (a: {}) => {
