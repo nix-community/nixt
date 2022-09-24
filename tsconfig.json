@@ -11,7 +11,8 @@
     ],
     "types": [
       "reflect-metadata",
-      "node"
+      "node",
+      "jest"
     ],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
