@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule: "weekly"
+    commit-message:
+      prefix: ":recycle: `env`"
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule: "weekly"
+    commit-message:
+      prefix: ":recycle: `env`"
