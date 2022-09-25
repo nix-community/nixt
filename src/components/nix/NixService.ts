@@ -1,15 +1,14 @@
-import path from "path";
-import { execSync } from "child_process";
-
 import { injectable } from "inversify";
 import { INixService } from "../../interfaces.js";
 import { NixOptions, Path } from "../../types.js";
+import { execSync } from "node:child_process";
+import { join } from "node:path";
 
 @injectable()
 export class NixService implements INixService {
-  public eval(file: Path, options: NixOptions) {
+  public eval(file: Path, options: NixOptions): any {
     const nixPath = (f: Path) => {
-      return path.join(import.meta.url.replace("file:", ""), "..", "..", "..", "..", "nix", f);
+      return join(import.meta.url.replace("file:", ""), "..", "..", "..", "nix", f);
     }
 
     const generateCallArgs = (a: {}) => {

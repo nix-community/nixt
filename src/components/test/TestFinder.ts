@@ -1,7 +1,7 @@
-import fs from 'fs';
-import { resolve } from 'path';
-
 import { inject, injectable } from "inversify";
+// TODO use fs/promises
+import fs from 'node:fs';
+import { resolve } from 'node:path';
 import { INixService, ITestFinder } from "../../interfaces.js";
 import { CliArgs, Path, TestCase, TestFile, TestSpec, TestSuite } from "../../types.js";
 

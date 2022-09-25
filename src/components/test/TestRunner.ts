@@ -1,6 +1,5 @@
-import { resolve } from "path";
-
 import { inject, injectable } from "inversify";
+import { resolve } from "node:path";
 import { INixService, ITestRunner } from "../../interfaces.js";
 import { CliArgs, NixOptions, Path, TestCase, TestFile, TestSuite } from "../../types.js";
 
@@ -14,23 +13,24 @@ export class TestRunner implements ITestRunner {
     this._nixService = nixService;
   }
 
-  public async run(args: CliArgs, files: TestFile[]): Promise<void> {
-    const getTestCase = (
-      f: Path,
-      s: TestSuite["name"],
-      c: TestCase["name"],
-      t: NixOptions["trace"]
-    ) => {
-      return this._nixService.eval("get-testcase.nix", {
-        trace: t,
-        args: {
-          path: resolve(f),
-          suite: s,
-          case: c
-        }
-      })
-    }
+  private getTestCase(
+    f: Path,
+    s: TestSuite["name"],
+    c: TestCase["name"],
+    t: NixOptions["trace"]
+  ) {
+    return this._nixService.eval("get-testcase.nix", {
+      trace: t,
+      args: {
+        path: resolve(f),
+        suite: s,
+        case: c
+      }
+    })
+  }
 
+  // TODO return TestFile[] to improve testability
+  public async run(args: CliArgs, files: TestFile[]): Promise<void> {
     let traceArg = false;
     if (args.verbose[1]) traceArg = true;
 
@@ -40,7 +40,7 @@ export class TestRunner implements ITestRunner {
         for (const [cName, c] of Object.entries(s.cases)) {
           if (args.debug) console.log(cName);
           try {
-            c.result = getTestCase(f.path, sName, cName, traceArg);
+            c.result = this.getTestCase(f.path, sName, cName, traceArg);
           } catch (e: any) {
             c.error = e.message;
           }
