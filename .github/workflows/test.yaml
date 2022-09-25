@@ -15,6 +15,7 @@ jobs:
         with:
           extra_nix_config: |
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+          nix_path: nixpkgs=channel:nixos-unstable
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
@@ -23,7 +24,7 @@ jobs:
 
       - run: npm ci
       - name: Run Jest
-        run: npm test
+        run: npm t
   nixt:
     runs-on: ubuntu-latest
     steps:
@@ -36,4 +37,4 @@ jobs:
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Nixt
-        run: nix run . -- nix
+        run: nix run . -- -d nix
