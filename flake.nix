@@ -30,5 +30,10 @@
       ];
       config.projectRoot = projectRoot;
       source = projectRoot;
+      settings = [
+        {
+          subsystemInfo.nodejs = 18;
+        }
+      ];
     };
 }
