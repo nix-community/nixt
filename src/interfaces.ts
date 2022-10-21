@@ -1,5 +1,5 @@
-import { injectable } from 'inversify';
-import { CliArgs, NixOptions, Path, TestFile } from './types.js';
+import { injectable } from "inversify";
+import { CliArgs, NixOptions, Path, TestFile } from "./types.js";
 
 @injectable()
 export abstract class IApp {

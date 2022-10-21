@@ -8,7 +8,7 @@ export type CliArgs = {
     recurse: boolean;
     debug: boolean;
     help: boolean;
-}
+};
 
 export type NixOptions = {
     attr?: string;
@@ -16,14 +16,14 @@ export type NixOptions = {
     trace?: boolean;
     debug?: boolean;
     args?: {};
-}
+};
 
 export type TestSpec = {
     path: Path;
     suites: {
         [key: string]: string[];
     };
-}
+};
 
 export class TestCase {
     name: string;

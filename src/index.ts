@@ -7,10 +7,10 @@ import { IApp } from "./interfaces.js";
 import { bindings } from "./bindings.js";
 
 async function init() {
-  const container = new Container();
-  container.loadAsync(bindings);
-  const app = container.get(IApp);
-  app.run();
+    const container = new Container();
+    container.loadAsync(bindings);
+    const app = container.get(IApp);
+    app.run();
 }
 
-init()
+init();
