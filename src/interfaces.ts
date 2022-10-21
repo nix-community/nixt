@@ -18,7 +18,7 @@ export abstract class ITestFinder {
 
 @injectable()
 export abstract class ITestRunner {
-    abstract run(args: CliArgs, testFiles: TestFile[]): Promise<void>;
+    abstract run(args: CliArgs, testFiles: TestFile[]): Promise<TestFile[]>;
 }
 
 @injectable()

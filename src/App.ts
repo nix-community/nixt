@@ -2,7 +2,7 @@ import chokidar from 'chokidar';
 
 import { inject, injectable } from 'inversify';
 import { IApp, IArgParser, IRenderService, ITestFinder, ITestRunner } from './interfaces.js';
-import { CliArgs } from './types.js';
+import { CliArgs, TestFile } from './types.js';
 
 @injectable()
 export class App implements IApp {
@@ -29,12 +29,14 @@ export class App implements IApp {
 
   public run() {
     const test = async () => {
+      let testFiles: TestFile[] = [];
+
       if (this.args.debug) console.log("Finding files!");
-      const testFiles = await this._testFinder.run(this.args);
+      testFiles = await this._testFinder.run(this.args);
 
       if (!this.args.list) {
         if (this.args.debug) console.log("Running tests!");
-        await this._testRunner.run(this.args, testFiles);
+        testFiles = await this._testRunner.run(this.args, testFiles);
       }
 
       if (this.args.debug) console.log("Rendering!")

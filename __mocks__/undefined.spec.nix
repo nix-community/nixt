@@ -6,7 +6,7 @@ let sut = pkgs.callPackage ./fail.nix { };
 
 in
 nixt.mkSuites {
-  "Failing Test" = {
-    "always fails" = false;
+  "Undefined Test" = {
+    "always undefined" = baz;
   };
 }
