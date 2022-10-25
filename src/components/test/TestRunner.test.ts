@@ -65,16 +65,19 @@ describe("TestRunner", () => {
     it("handles undefined tests", async () => {
         args.paths = ["__mocks__/undefined.spec.nix"]
 
+        const nixPath = path.resolve("nix/get-testcase.nix")
+        const testPath = path.resolve("__mocks__/undefined.spec.nix");
+
         const result = await sut.run(args, await testFinder.run(args))
         expect(result).toEqual([{
-            "path": path.resolve("__mocks__/undefined.spec.nix"),
+            "path": testPath,
             "suites": {
                 "Undefined Test": {
                     "name": "Undefined Test",
                     "cases": {
                         "always undefined": {
                             "name": "always undefined",
-                            "error": "Command failed: nix eval --json --impure  --expr 'import /home/lord-valen/dev/nixt/nix/get-testcase.nix { path = \"/home/lord-valen/dev/nixt/__mocks__/undefined.spec.nix\"; suite = \"Undefined Test\"; case = \"always undefined\"; }'\nerror: undefined variable 'baz'\n\n       at /home/lord-valen/dev/nixt/__mocks__/undefined.spec.nix:10:26:\n\n            9|   \"Undefined Test\" = {\n           10|     \"always undefined\" = baz;\n             |                          ^\n           11|   };\n(use '--show-trace' to show detailed location information)\n",
+                            "error": `Command failed: nix eval --json --impure  --expr 'import ${nixPath} { path = \"${testPath}\"; suite = \"Undefined Test\"; case = \"always undefined\"; }'\nerror: undefined variable 'baz'\n\n       at /home/lord-valen/dev/nixt/__mocks__/undefined.spec.nix:10:26:\n\n            9|   \"Undefined Test\" = {\n           10|     \"always undefined\" = baz;\n             |                          ^\n           11|   };\n(use '--show-trace' to show detailed location information)\n`,
                         },
                     },
                 },
