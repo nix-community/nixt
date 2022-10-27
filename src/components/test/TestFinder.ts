@@ -1,6 +1,5 @@
 import { inject, injectable } from "inversify";
-// TODO use fs/promises
-import fs from 'node:fs';
+import { readdir, stat } from "node:fs/promises";
 import { resolve } from 'node:path';
 import { INixService, ITestFinder } from "../../interfaces.js";
 import { CliArgs, Path, TestCase, TestFile, TestSpec, TestSuite } from "../../types.js";
@@ -15,27 +14,32 @@ export class TestFinder implements ITestFinder {
         this._nixService = nixService;
     }
 
-    private getFiles(args: CliArgs, path: Path): Path[] {
+    private async getFiles(args: CliArgs, path: Path): Promise<Path[]> {
         let files: Path[] = [];
 
-        if (fs.existsSync(path)) {
-            const stats = fs.statSync(path);
+        try {
+            const stats = await stat(path);
 
             if (stats.isFile()) files = [path];
 
             if (stats.isDirectory()) {
-                const read = fs.readdirSync(path).map((file: string) => `${path}/${file}`);
+                const read = await readdir(path).then((fs) => fs.map((f) => `${path}/${f}`));
 
-                files = read.filter((file: string) => fs.statSync(file).isFile());
-                const dirs = read.filter((file: string) => fs.statSync(file).isDirectory());
+                files = read.filter((f) => stat(f).then((f) => f.isFile()));
+                const dirs = read.filter((f) => stat(f).then((f) => f.isDirectory()));
 
                 if (args.recurse && dirs.length > 0) {
-                    const newFiles = dirs.map((dir: string) => this.getFiles(args, dir)).flat();
-                    files = files.concat(newFiles);
+                    const newFiles = await Promise.all(dirs.map((d) => this.getFiles(args, d)));
+                    files = files.concat(newFiles.flat());
                 }
             }
-        } else {
-            console.log(`Path ${path} does not exist!`);
+        } catch (e: any) {
+            if (e.code === "ENOENT") {
+                console.log(`File does not exist: ${path}`);
+            }
+            else {
+                console.log(`IO error: ${e.code}`);
+            }
         }
 
         return files;
@@ -62,11 +66,11 @@ export class TestFinder implements ITestFinder {
         for (const p of args.paths) {
             const absolutePath = resolve(p);
 
-            const files = this.getFiles(args, absolutePath)
-                .filter((p: Path) =>
+            const files = await this.getFiles(args, absolutePath).then((fs) =>
+                fs.filter((p: Path) =>
                     p.endsWith(".test.nix")
                     || p.endsWith(".spec.nix")
-                    || p.endsWith(".nixt"));
+                    || p.endsWith(".nixt")));
 
             for (const file of files) {
                 if (args.debug) console.log(`Found file: ${file}`);
