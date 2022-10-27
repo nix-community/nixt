@@ -36,12 +36,12 @@ export class TestRunner implements ITestRunner {
         if (args.verbose[1]) traceArg = true;
 
         for (const f of newFiles) {
-            for (const [sName, s] of Object.entries(f.suites)) {
-                if (args.debug) console.log(sName)
-                for (const [cName, c] of Object.entries(s.cases)) {
-                    if (args.debug) console.log(cName);
+            for (const s of f.suites) {
+                if (args.debug) console.log(s.name)
+                for (const c of s.cases) {
+                    if (args.debug) console.log(c.name);
                     try {
-                        c.result = this.getTestCase(f.path, sName, cName, traceArg);
+                        c.result = this.getTestCase(f.path, s.name, c.name, traceArg);
                     } catch (e: any) {
                         c.error = e.message;
                     }

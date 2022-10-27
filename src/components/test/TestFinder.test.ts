@@ -3,25 +3,45 @@ import "reflect-metadata";
 import { Container } from "inversify";
 import { bindings } from "../../bindings.js";
 import { ITestFinder } from "../../interfaces.js";
+import { CliArgs } from "../../types.js";
+import path from "node:path";
+
+const defaultArgs = {
+    paths: ["."],
+    watch: false,
+    verbose: [false, false],
+    list: false,
+    recurse: false,
+    debug: false,
+    help: false
+};
 
 describe("ItFinder", () => {
-  let container: Container;
-  let sut: ITestFinder;
+    let container: Container;
+    let args: CliArgs;
+    let sut: ITestFinder;
 
-  beforeAll(() => {
-    container = new Container;
-    container.loadAsync(bindings);
-    sut = container.get(ITestFinder);
-  })
+    beforeAll(() => {
+        container = new Container;
+        container.loadAsync(bindings);
+        sut = container.get(ITestFinder);
+    })
 
-  beforeEach(() => {
-    container.snapshot();
-  })
+    beforeEach(() => {
+        container.snapshot();
+        args = defaultArgs;
+    })
 
-  it("is defined", () => {
-    expect(sut).toBeDefined();
-  })
+    it("is defined", () => {
+        expect(sut).toBeDefined();
+    })
 
-  it.todo("returns correct structure");
-  it.todo("sets importError values");
+    it("handles import failures", async () => {
+        args.paths = ["__mocks__/invalid.test.nix"];
+
+        const result = await sut.run(args)
+        expect(result[0].path).toStrictEqual(path.resolve("__mocks__/invalid.test.nix"));
+        expect(result[0].suites).toStrictEqual([]);
+        expect(result[0].importError).toBeDefined();
+    })
 })

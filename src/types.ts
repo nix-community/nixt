@@ -37,21 +37,21 @@ export class TestCase {
 
 export class TestSuite {
     name: string;
-    cases: Record<string, TestCase>;
+    cases: TestCase[];
 
     constructor(name: string) {
         this.name = name;
-        this.cases = {};
+        this.cases = [];
     }
 }
 
 export class TestFile {
     path: Path;
-    suites: Record<string, TestSuite>;
+    suites: TestSuite[];
     importError?: string;
 
     constructor(path: Path) {
         this.path = path;
-        this.suites = {};
+        this.suites = [];
     }
 }
