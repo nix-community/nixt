@@ -6,39 +6,48 @@ import { bindings } from "../../bindings.js";
 import { INixService } from "../../interfaces.js";
 
 describe("NixService", () => {
-  let container: Container;
-  let sut: INixService;
+    let container: Container;
+    let sut: INixService;
 
-  beforeAll(() => {
-    container = new Container;
-    container.loadAsync(bindings);
-    sut = container.get(INixService);
-  })
-
-  beforeEach(() => {
-    container.snapshot();
-  })
-
-  afterEach(() => {
-    container.restore();
-  })
-
-  it("is defined", () => {
-    expect(sut).toBeDefined();
-  })
-
-  it("returns nix results", () => {
-    const p = resolve("__mocks__/valid.nixt");
-    const expected = { "path": p, "suites": { "Valid Tests": ["always passes"] } }
-
-    const result = sut.eval("get-testspec.nix", {
-      trace: false,
-      debug: false,
-      args: { path: p }
+    beforeAll(() => {
+        container = new Container;
+        container.loadAsync(bindings);
+        sut = container.get(INixService);
     })
 
-    expect(result).toStrictEqual(expected)
-  })
+    beforeEach(() => {
+        container.snapshot();
+    })
 
-  it.todo("throws error on invalid path")
+    afterEach(() => {
+        container.restore();
+    })
+
+    it("is defined", () => {
+        expect(sut).toBeDefined();
+    })
+
+    it("returns nix results", () => {
+        const p = resolve("__mocks__/valid.nixt");
+        const expected = { "path": p, "suites": { "Valid Tests": ["always passes"] } }
+
+        const result = sut.eval("get-testspec.nix", {
+            trace: false,
+            debug: false,
+            args: { path: p }
+        })
+
+        expect(result).toStrictEqual(expected)
+    })
+
+    it("throws error on invalid path", () => {
+        function testSut() {
+            sut.eval("somePathWhichDoesNotExist", {
+                trace: false,
+                debug: false,
+                args: { path: resolve("__mocks__/valid.nixt") }
+            })
+        }
+        expect(testSut).toThrow(Error);
+    })
 })
