@@ -32,6 +32,10 @@ describe("ItFinder", () => {
         args = defaultArgs;
     })
 
+    afterEach(() => {
+        container.restore();
+    })
+
     it("is defined", () => {
         expect(sut).toBeDefined();
     })
