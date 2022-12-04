@@ -1,60 +1,55 @@
 import chokidar from "chokidar";
 
 import { inject, injectable } from "inversify";
-import { IApp, IArgParser, IRenderService, ITestFinder, ITestRunner } from "./interfaces.js";
+import { IApp, IRenderService, ITestFinder, ITestRunner } from "./interfaces.js";
 import { CliArgs, TestFile } from "./types.js";
 
 @injectable()
 export class App implements IApp {
-    private _argParser: IArgParser;
     private _testRunner: ITestRunner;
     private _renderService: IRenderService;
     private _testFinder: ITestFinder;
 
-    private args: CliArgs;
-
     public constructor(
-        @inject(IArgParser) argParser: IArgParser,
         @inject(ITestRunner) testRunner: ITestRunner,
         @inject(IRenderService) renderService: IRenderService,
         @inject(ITestFinder) testFinder: ITestFinder
     ) {
-        this._argParser = argParser;
         this._testRunner = testRunner;
         this._renderService = renderService;
         this._testFinder = testFinder;
-
-        this.args = this._argParser.run();
     }
 
-    public run() {
-        const test = async () => {
-            let testFiles: TestFile[] = [];
+    public run(args: CliArgs) {
+        if (args.watch) {
+            this.watch(args);
+        } else {
+            this.test(args);
+        }
+        return;
+    }
 
-            if (this.args.debug) console.log("Finding files!");
-            testFiles = await this._testFinder.run(this.args);
+    public watch(args: CliArgs) {
+        console.clear();
+        this.test(args);
+        chokidar
+            .watch(args.paths, { ignoreInitial: true })
+            .on("all", () => {
+                console.clear();
+                this.test(args);
+            });
+    }
 
-            if (!this.args.list) {
-                if (this.args.debug) console.log("Running tests!");
-                testFiles = await this._testRunner.run(this.args, testFiles);
-            }
+    public async test(args: CliArgs) {
+        let testFiles: TestFile[] = [];
+        let testedFiles: TestFile[] = [];
 
-            if (this.args.debug) console.log("Rendering!");
-            this._renderService.run(this.args, testFiles);
-        };
+        testFiles = await this._testFinder.run(args);
 
-        if (this.args.watch) {
-            console.clear();
-            chokidar
-                .watch(this.args.paths, { ignoreInitial: true })
-                .on("all", (event: string, path: string) => {
-                    console.clear();
-                    if (this.args.debug) console.log(event, path);
-                    test();
-                });
+        if (!args.list) {
+            testedFiles = await this._testRunner.run(args, testFiles);
         }
 
-        test();
-        return;
+        this._renderService.run(args, testedFiles);
     }
 }
