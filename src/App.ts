@@ -42,14 +42,13 @@ export class App implements IApp {
 
     public async test(args: CliArgs) {
         let testFiles: TestFile[] = [];
-        let testedFiles: TestFile[] = [];
 
         testFiles = await this._testFinder.run(args);
 
         if (!args.list) {
-            testedFiles = await this._testRunner.run(args, testFiles);
+            testFiles = await this._testRunner.run(args, testFiles);
         }
 
-        this._renderService.run(args, testedFiles);
+        this._renderService.run(args, testFiles);
     }
 }
