@@ -1,5 +1,3 @@
-{ bar ? "baz" }:
-
-{
+{bar ? "baz"}: {
   result = bar;
 }
