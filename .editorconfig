@@ -1,11 +1,22 @@
 root = true
 
 [*]
-max_line_length = 100
+max_line_length = 120
 trim_trailing_whitespace = true
 end_of_line = lf
 insert_final_newline = true
-
-[*.{nix,ts,json}]
 indent_style = space
+
+[*.nix]
+indent_size = 2
+
+[*.{tsx?,jsx?,json}]
 indent_size = 4
+
+[{*.lock,package-lock.json}]
+max_line_length = unset
+trim_trailing_whitespace = unset
+end_of_line = unset
+insert_final_newline = unset
+indent_style = unset
+indent_size = unset
