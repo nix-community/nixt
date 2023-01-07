@@ -7,6 +7,10 @@
       flake = false;
     };
 
+    std.url = "github:divnix/std";
+
+    nixpkgs.url = "nixpkgs";
+
     dream2nix = {
       url = "github:nix-community/dream2nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -14,42 +18,22 @@
   };
 
   outputs = {
-    nixpkgs,
-    flake-utils,
-    dream2nix,
-    ...
-  }: let
-    projectRoot = builtins.path {
-      path = ./.;
-      name = "projectRoot";
-    };
-
-    d2nFlake = dream2nix.lib.makeFlakeOutputs {
-      systems = flake-utils.lib.defaultSystems;
-      config.projectRoot = projectRoot;
-      source = projectRoot;
-      settings = [
-        {
-          subsystemInfo.nodejs = 18;
-        }
+      std,
+      self,
+      ...
+  } @ inputs:
+    std.growOn {
+      inherit inputs;
+      cellsFrom = ./cells;
+      cellBlocks = with std.blockTypes; [
+        (installables "packages" {ci.build = true;})
+        (devshells "devshells")
+        (functions "dream2nix")
+        (nixago "configs")
       ];
-    };
-  in
-    dream2nix.lib.dlib.mergeFlakes [
-      d2nFlake
-      (flake-utils.lib.eachDefaultSystem (system: let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in {
-        devShells.default = d2nFlake.devShells.${system}.default.overrideAttrs (old: {
-          buildInputs =
-            old.buildInputs
-            ++ [
-              pkgs.treefmt
-              pkgs.alejandra
-              pkgs.nodePackages.prettier
-              pkgs.editorconfig-checker
-            ];
-        });
-      }))
-    ];
+    }
+      {
+        packages = std.harvest self ["nixt" "packages"];
+        devshells.default = std.harvest self ["nixt" "devshells"];
+      };
 }
