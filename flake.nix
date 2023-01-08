@@ -34,6 +34,6 @@
     }
       {
         packages = std.harvest self ["nixt" "packages"];
-        devshells.default = std.harvest self ["nixt" "devshells"];
+        devShells = std.harvest self ["nixt" "devshells"];
       };
 }

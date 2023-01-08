@@ -4,3 +4,8 @@ result
 node_modules
 .direnv
 coverage
+.std/
+
+# nixago: ignore-linked-files
+lefthook.yml
+treefmt.toml
