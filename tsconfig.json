@@ -5,19 +5,39 @@
         "moduleResolution": "Node16",
         "moduleDetection": "force",
         "target": "ES2020",
-        "lib": ["ES2020", "DOM"],
-        "types": ["reflect-metadata", "node", "jest"],
+        "lib": [
+            "ES2020",
+            "dom"
+        ],
+        "types": [
+            "node",
+            "reflect-metadata",
+            "vitest/importMeta",
+            "vitest/globals"
+        ],
         "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "exactOptionalPropertyTypes": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noUncheckedIndexedAccess": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "strict": true,
         "declaration": true,
         "declarationMap": true,
-        "strict": true,
-        "noImplicitReturns": true,
-        "skipLibCheck": true,
-        "experimentalDecorators": true,
+        "esModuleInterop": true,
         "emitDecoratorMetadata": true,
-        "jsx": "react"
+        "experimentalDecorators": true,
+        "skipLibCheck": true
     },
-    "include": ["src/**/*.ts"],
-    "exclude": ["node_modules"]
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
 }

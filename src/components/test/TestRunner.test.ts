@@ -46,17 +46,19 @@ describe("TestRunner", () => {
         args.paths = ["__mocks__/fail.spec.nix"];
 
         const result: TestFile[] = await sut.run(args, await testFinder.run(args))
-        expect(result[0].path).toStrictEqual(path.resolve("__mocks__/fail.spec.nix"));
-        expect(result[0].importError).toBeUndefined();
-        expect(result[0].suites[0].cases[0].result).toEqual(false);
+        expect(result[0]).toBeDefined();
+        expect(result[0]?.path).toStrictEqual(path.resolve("__mocks__/fail.spec.nix"));
+        expect(result[0]?.importError).toBeUndefined();
+        expect(result[0]?.suites[0]?.cases[0]?.result).toEqual(false);
     })
 
     it("handles undefined tests", async () => {
         args.paths = ["__mocks__/undefined.spec.nix"]
 
         const result: TestFile[] = await sut.run(args, await testFinder.run(args))
-        expect(result[0].path).toStrictEqual(path.resolve("__mocks__/undefined.spec.nix"));
-        expect(result[0].importError).toBeUndefined();
-        expect(result[0].suites[0].cases[0].error).toBeDefined();
+        expect(result[0]).toBeDefined();
+        expect(result[0]?.path).toStrictEqual(path.resolve("__mocks__/undefined.spec.nix"));
+        expect(result[0]?.importError).toBeUndefined();
+        expect(result[0]?.suites[0]?.cases[0]?.error).toBeDefined();
     })
 })

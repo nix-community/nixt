@@ -1,6 +1,5 @@
 import "reflect-metadata";
 
-import { jest } from "@jest/globals";
 import { Container } from "inversify";
 import { bindings } from "./bindings.js";
 import { IApp, IRenderService, ITestFinder, ITestRunner } from "./interfaces.js";
@@ -47,7 +46,7 @@ describe("App", () => {
 
     afterEach(() => {
         container.restore();
-        jest.restoreAllMocks();
+        vi.restoreAllMocks();
     })
 
     it("is defined", () => {
@@ -55,7 +54,7 @@ describe("App", () => {
     });
 
     it("calls test() once when watch is false", () => {
-        const spy = jest.spyOn(sut, "test").mockImplementation(() => {});
+        const spy = vi.spyOn(sut, "test").mockImplementation(() => {});
 
         sut.run(args);
 

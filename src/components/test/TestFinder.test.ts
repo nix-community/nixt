@@ -44,8 +44,9 @@ describe("ItFinder", () => {
         args.paths = ["__mocks__/invalid.test.nix"];
 
         const result = await sut.run(args)
-        expect(result[0].path).toStrictEqual(path.resolve("__mocks__/invalid.test.nix"));
-        expect(result[0].suites).toStrictEqual([]);
-        expect(result[0].importError).toBeDefined();
+        expect(result[0]).toBeDefined();
+        expect(result[0]?.path).toStrictEqual(path.resolve("__mocks__/invalid.test.nix"));
+        expect(result[0]?.suites).toStrictEqual([]);
+        expect(result[0]?.importError).toBeDefined();
     })
 })
