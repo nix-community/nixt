@@ -1,6 +1,6 @@
 {
     "name": "nixt",
-    "version": "0.3.7",
+    "version": "0.3.8",
     "description": "Test-runner for Nix",
     "author": "Dustin Lacewell",
     "license": "MIT",
@@ -17,9 +17,9 @@
         "test": "vitest"
     },
     "devDependencies": {
-        "@types/node": "^18.11.10",
+        "@types/node": "^18.11.18",
         "ink-testing-library": "^2.1.0",
-        "typescript": "^4.9.3",
+        "typescript": "^4.9.4",
         "vitest": "^0.27.0"
     },
     "dependencies": {
