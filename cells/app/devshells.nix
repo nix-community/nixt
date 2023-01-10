@@ -12,10 +12,7 @@ in
         # FIXME: The std checks fail. Likely upstream.
         # std.std.devshellProfiles.default
         # d2n doesn't always use numtide/devshell which causes compatibility issues.
-        # cell.dream2nix.outputs.devShells.${nixpkgs.system}.default
-      ];
-      packages = [
-        nixpkgs.editorconfig-checker
+        # cell.dream2nix.devShells.${nixpkgs.system}.default
       ];
       commands = [
         {package = nixpkgs.nodePackages.npm;}

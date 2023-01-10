@@ -1,8 +1,9 @@
-{ inputs, cell }:
-let
-  inherit (inputs) std nixpkgs;
-in
 {
+  inputs,
+  cell,
+}: let
+  inherit (inputs) std nixpkgs;
+in {
   treefmt = std.std.nixago.treefmt {
     packages = [
       nixpkgs.alejandra
@@ -11,11 +12,11 @@ in
     configData.formatter = {
       nix = {
         command = "alejandra";
-        includes = [ "*.nix" ];
+        includes = ["*.nix"];
       };
       prettier = {
         command = "prettier";
-        includes = [ "*.md" "*.ts" "*.json" ];
+        includes = ["*.md" "*.ts" "*.json"];
       };
     };
   };

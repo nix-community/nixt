@@ -11,6 +11,8 @@
 
     nixpkgs.url = "nixpkgs";
 
+    yants.url = "github:divnix/yants";
+
     dream2nix = {
       url = "github:nix-community/dream2nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -18,22 +20,30 @@
   };
 
   outputs = {
-      std,
-      self,
-      ...
+    std,
+    self,
+    ...
   } @ inputs:
     std.growOn {
       inherit inputs;
       cellsFrom = ./cells;
       cellBlocks = with std.blockTypes; [
+        # app
         (installables "packages" {ci.build = true;})
         (devshells "devshells")
         (functions "dream2nix")
         (nixago "configs")
+
+        # lib
+        ## for external consumption
+        (functions "nixt")
+        ## for cli use
+        (functions "standalone")
       ];
     }
-      {
-        packages = std.harvest self ["nixt" "packages"];
-        devShells = std.harvest self ["nixt" "devshells"];
-      };
+    {
+      packages = std.harvest self ["app" "packages"];
+      devShells = std.harvest self ["app" "devshells"];
+      lib = std.harvest self ["lib" "nixt"];
+    };
 }

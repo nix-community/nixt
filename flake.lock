@@ -458,6 +458,21 @@
         "type": "github"
       }
     },
+    "nixpkgs_3": {
+      "locked": {
+        "lastModified": 1660438583,
+        "narHash": "sha256-rJUTYxFKlWUJI3njAwEc1pKAVooAViZGJvsgqfh/q/E=",
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "rev": "bbd8f7cd87d0b29294ef3072ffdbd61d60f05da4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "type": "github"
+      }
+    },
     "nosys": {
       "locked": {
         "lastModified": 1667881534,
@@ -520,7 +535,8 @@
         "dream2nix": "dream2nix",
         "flake-compat": "flake-compat",
         "nixpkgs": "nixpkgs",
-        "std": "std"
+        "std": "std",
+        "yants": "yants_2"
       }
     },
     "rust-analyzer-src": {
@@ -566,11 +582,11 @@
         "yants": "yants"
       },
       "locked": {
-        "lastModified": 1673118707,
-        "narHash": "sha256-Ci2FraWRDnm7zmqY8NBUGJivLnpvgu833cU2IG4sQso=",
+        "lastModified": 1673317235,
+        "narHash": "sha256-wrVmvBOaiDIQaYO+oVFCXnu8uLlNpeQSxpR+8JThFWY=",
         "owner": "divnix",
         "repo": "std",
-        "rev": "30f357e647c7b26c6b3a6fbe15e90bc500885c6e",
+        "rev": "30b8998b2a15434ba70dd973895accf79bddd641",
         "type": "github"
       },
       "original": {
@@ -592,6 +608,24 @@
         "owner": "divnix",
         "repo": "yants",
         "rev": "d18f356ec25cb94dc9c275870c3a7927a10f8c3c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "divnix",
+        "repo": "yants",
+        "type": "github"
+      }
+    },
+    "yants_2": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_3"
+      },
+      "locked": {
+        "lastModified": 1672963353,
+        "narHash": "sha256-KC032e1G3MKPeW8JWgL/bBvbv529ch13sFgsd2MNSFQ=",
+        "owner": "divnix",
+        "repo": "yants",
+        "rev": "d7253ea436060f598c5d0ef3b22594fd28e7eab2",
         "type": "github"
       },
       "original": {

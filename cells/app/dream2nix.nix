@@ -1,12 +1,13 @@
-{ inputs, cell }:
-let
-  inherit (inputs) std dream2nix self;
-  in
 {
-  outputs = (dream2nix.lib.makeFlakeOutputs {
-    systems = [ inputs.nixpkgs.system ];
+  inputs,
+  cell,
+}: let
+  inherit (inputs) std dream2nix self;
+in
+  dream2nix.lib.makeFlakeOutputs {
+    systems = [inputs.nixpkgs.system];
     config.projectRoot = self;
-    source = std.incl (self) [
+    source = std.incl self [
       (self + /package.json)
       (self + /package-lock.json)
       (self + /tsconfig.json)
@@ -18,5 +19,4 @@ let
         subsystemInfo.nodejs = 18;
       }
     ];
-  });
-}
+  }
