@@ -10,7 +10,7 @@
   Schema = struct "Schema" {
     __schema = string;
     options = Options;
-    testSpec = TestSpec;
+    testSpec = list TestFile;
   };
 
   Options = struct {
@@ -18,10 +18,6 @@
     watch = bool;
     verbose = bool;
     trace = bool;
-  };
-
-  TestSpec = list struct "TestSpec" {
-    files = list TestFile;
   };
 
   TestFile = struct "TestFile" {
@@ -51,12 +47,10 @@ in {
         Schema {
           __schema = "v0";
           options = options;
-          testSpec = TestSpec {
-            files =
+          testSpec =
               if lib.isList files
               then files
               else lib.toList files;
-          };
         }
     );
 
