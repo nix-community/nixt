@@ -14,17 +14,17 @@ export class TestRunner implements ITestRunner {
     }
 
     private getTestCase(
-        f: Path,
-        s: TestSuite["name"],
-        c: TestCase["name"],
-        t: NixOptions["trace"]
+        file: Path,
+        testSuite: TestSuite["name"],
+        testCase: TestCase["name"],
+        trace: NixOptions["trace"]
     ) {
         return this._nixService.eval("get-testcase.nix", {
-            trace: t,
+            trace: trace,
             args: {
-                path: resolve(f),
-                suite: s,
-                case: c
+                path: resolve(file),
+                suite: testSuite,
+                case: testCase,
             }
         })
     }

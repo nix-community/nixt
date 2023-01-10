@@ -13,7 +13,7 @@ export type CliArgs = {
 export type NixOptions = {
     attr?: string;
     strict?: boolean;
-    trace?: boolean;
+    trace: boolean;
     debug?: boolean;
     args?: {};
 };

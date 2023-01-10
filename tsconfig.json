@@ -31,6 +31,7 @@
         "declarationMap": true,
         "esModuleInterop": true,
         "emitDecoratorMetadata": true,
+        "jsx": "preserve",
         "experimentalDecorators": true,
         "skipLibCheck": true
     },

@@ -51,34 +51,33 @@ export class RenderService implements IRenderService {
     return
   }
 
-  private result(args: CliArgs, c: TestCase, lastC: boolean, lastS: boolean): void {
+  private result(args: CliArgs, testCase: TestCase, lastCase: boolean, lastSuite: boolean): void {
     let glyph: string;
-    if (c.error) {
+    if (testCase.error) {
       process.exitCode = 1
     }
 
-    glyph = lastS && lastC && !c.error ? '┗' : '┃';
-    const mark = c.result ? colors.green('✓') : colors.red('✗');
-    if (!c.result || args.verbose[0]) {
-      console.log(`${colors.gray(glyph)}     ${mark} ${c.name}`);
+    glyph = lastSuite && lastCase && !testCase.error ? '┗' : '┃';
+    const mark = testCase.result ? colors.green('✓') : colors.red('✗');
+    if (!testCase.result || args.verbose[0]) {
+      console.log(`${colors.gray(glyph)}     ${mark} ${testCase.name}`);
     }
 
-    if (c.error && args.verbose[0]) {
-      const ls: string[] = c.error
+    if (testCase.error && args.verbose[0]) {
+      const lines: string[] = testCase.error
         .split('\n')
         .map((line) => line.trim())
         .filter((line) => line.length > 0);
 
-      if (ls.length > 1) {
-        const first = ls[0];
-        if (first.startsWith('Command failed: nix eval')) {
-          ls.shift();
+      if (lines.length > 1) {
+        if (lines[0]?.startsWith('Command failed: nix eval')) {
+          lines.shift();
         }
 
-        for (const [i, l] of Object.entries(ls)) {
-          const lastL = parseInt(i) === ls.length - 1;
-          glyph = lastL && lastC && lastS ? '┗' : '┃';
-          console.log(`${colors.yellow(glyph)}       ${colors.yellow(colors.italic(l))}`);
+        for (const [i, line] of Object.entries(lines)) {
+          const lastLine = parseInt(i) === lines.length - 1;
+          glyph = lastLine && lastCase && lastSuite ? '┗' : '┃';
+          console.log(`${colors.yellow(glyph)}       ${colors.yellow(colors.italic(line))}`);
         }
       }
     }
