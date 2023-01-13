@@ -39,11 +39,14 @@
         (functions "nixt")
         ## for cli use
         (functions "standalone")
+        ## testing
+        (data "tests")
       ];
     }
     {
       packages = std.harvest self ["app" "packages"];
       devShells = std.harvest self ["app" "devshells"];
-      lib = std.harvest self ["lib" "nixt"];
+      lib = std.pick self ["lib" "nixt"];
+      __nixt = std.pick self ["lib" "tests"];
     };
 }

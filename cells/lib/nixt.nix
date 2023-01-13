@@ -3,17 +3,17 @@
   cell,
 }: let
   inherit (inputs) nixpkgs yants;
-  lib = nixpkgs // builtins;
+  lib = nixpkgs.lib // builtins;
 
-  inherit (yants) string bool path list struct defun either option;
+  inherit (yants) string bool path attrs list struct defun either option;
 
   Schema = struct "Schema" {
     __schema = string;
-    options = Options;
+    settings = Settings;
     testSpec = list TestFile;
   };
 
-  Options = struct {
+  Settings = struct "Settings" {
     list = bool;
     watch = bool;
     verbose = bool;
@@ -34,45 +34,51 @@
 
   TestCase = struct "TestCase" {
     name = string;
-    assertions = list bool;
+    expressions = list bool;
   };
 in {
   ## For use in flake.nix
   # TODO: Consume it.
   # Build the nixt schema. Should be outputted to __nixt for CLI consumption.
   grow =
-    defun [(either TestFile (list TestFile)) (option Options)]
+    defun [
+      (struct {
+        blocks = either TestFile (list TestFile);
+        settings = option Settings;
+      })
+      Schema
+    ]
     (
-      files: options:
+      {
+        blocks,
+        settings ? {
+          list = false;
+          watch = false;
+          verbose = false;
+          trace = false;
+        },
+      }:
         Schema {
-          __schema = "v0";
-          options = options;
-          testSpec =
-              if lib.isList files
-              then files
-              else lib.toList files;
+          __schema = "v0.0";
+          settings = settings;
+          testSpec = blocks;
         }
     );
 
-  # For use with testing files: block <path> <import>
-  # For use with testing blocks: block <path> <import.blockAttr>
-  #
-  # A testing file is really just a file-sized testing block.
-  # Because the block encompasses the entire file, no mkBlock is necessary.
-  block =
-    defun [path Block]
+  # Prepare blocks for grow consumption
+  stack =
+    defun [path Block TestFile]
     (
-      path: block:
+      path: suites:
         TestFile {
-          path = path;
-          suites = block;
+          inherit path suites;
         }
     );
 
-  ## For use in test/source files
-  # Designates a nixt block. Unnecessary for separate test files.
-  mkBlock =
-    defun [(either TestSuite (list TestSuite))]
+  ## This seems superfluous. Just make a list of suites yourself?
+  # Designates a nixt block
+  block =
+    defun [(either TestSuite (list TestSuite)) Block]
     (
       suites:
         if lib.isList suites
@@ -81,27 +87,27 @@ in {
     );
 
   # Designates a test suite
-  describe =
-    defun [string (list TestCase)]
+  describe = let
+    # Prepares test cases for describe consumption
+    it =
+      defun [string (either bool (list bool)) TestCase]
+      (
+        name: expressions:
+          TestCase {
+            inherit name;
+            expressions =
+              if lib.isList expressions
+              then expressions
+              else lib.toList expressions;
+          }
+      );
+  in
+    defun [string (attrs (either bool (list bool))) TestSuite]
     (
       name: cases:
         TestSuite {
-          name = name;
-          cases = lib.mapAttrsToList (key: value: key) cases;
-        }
-    );
-
-  # Designates a test case
-  it =
-    defun [string (either bool (list bool))]
-    (
-      name: expressions:
-        TestCase {
-          name = name;
-          assertions =
-            if lib.isList expressions
-            then expressions
-            else lib.toList expressions;
+          inherit name;
+          cases = lib.mapAttrsToList (caseName: expressions: it caseName expressions) cases;
         }
     );
 }
