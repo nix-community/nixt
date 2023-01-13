@@ -6,6 +6,6 @@
 in
   nixt.grow {
     blocks = [
-      (nixt.stack ./nixt.spec.nix (import ./nixt.spec.nix {inherit inputs cell;}))
+      (import ./nixt.spec.nix {inherit inputs cell;})
     ];
   }
