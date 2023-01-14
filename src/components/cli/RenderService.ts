@@ -1,9 +1,8 @@
-import { injectable } from "inversify";
+import colors from "colors";
+import { fluentProvide } from "inversify-binding-decorators";
 import { IRenderService } from "../../interfaces.js";
 import { CliArgs, TestCase, TestFile, TestSuite } from "../../types.js";
-
-import colors from "colors";
-import * as warningFilters from './warningFilters/index.js'
+import * as warningFilters from './warningFilters/index.js';
 
 type Data = {
   args: CliArgs;
@@ -14,7 +13,7 @@ type Data = {
   importFailures: TestFile[];
 }
 
-@injectable()
+@fluentProvide(IRenderService).whenTargetTagged("ink", false).done()
 export class RenderService implements IRenderService {
   private getData(args: CliArgs, files: TestFile[]): Data {
     const suites = [];

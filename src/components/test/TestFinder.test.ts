@@ -1,10 +1,10 @@
 import "reflect-metadata";
 
 import { Container } from "inversify";
+import path from "node:path";
 import { bindings } from "../../bindings.js";
 import { ITestFinder } from "../../interfaces.js";
 import { CliArgs } from "../../types.js";
-import path from "node:path";
 
 const defaultArgs = {
     standalone: true,
@@ -24,7 +24,7 @@ describe("ItFinder", () => {
 
     beforeAll(() => {
         container = new Container;
-        container.loadAsync(bindings);
+        container.load(bindings);
         sut = container.get(ITestFinder);
     })
 

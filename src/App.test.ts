@@ -4,7 +4,6 @@ import { Container } from "inversify";
 import { bindings } from "./bindings.js";
 import { IApp, IRenderService, ITestFinder, ITestRunner } from "./interfaces.js";
 import { CliArgs } from "./types.js";
-import { buildProviderModule } from "inversify-binding-decorators";
 
 describe("App", () => {
     let container: Container;
@@ -25,8 +24,7 @@ describe("App", () => {
 
     beforeAll(() => {
         container = new Container();
-        container.loadAsync(bindings);
-        container.load(buildProviderModule());
+        container.load(bindings);
         container.rebind(ITestFinder).toConstantValue(testFinder);
         container.rebind(ITestRunner).toConstantValue(testRunner);
         container.rebind(IRenderService).toConstantValue(renderService);

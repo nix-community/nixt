@@ -1,10 +1,10 @@
 import "reflect-metadata";
 
 import { Container } from "inversify";
+import path from "node:path";
 import { bindings } from "../../bindings.js";
 import { ITestFinder, ITestRunner } from "../../interfaces.js";
 import { CliArgs, TestFile } from "../../types.js";
-import path from "node:path";
 
 describe("TestRunner", () => {
     let container: Container;
@@ -14,7 +14,7 @@ describe("TestRunner", () => {
 
     beforeAll(() => {
         container = new Container;
-        container.loadAsync(bindings);
+        container.load(bindings);
         testFinder = container.get(ITestFinder);
         sut = container.get(ITestRunner);
     })

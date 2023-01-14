@@ -3,7 +3,6 @@ import "reflect-metadata";
 import { Container } from "inversify";
 import { bindings } from "../../bindings.js";
 import { IRenderService } from "../../interfaces.js";
-import { InkService } from "./index.js";
 
 describe("InkRenderService", () => {
     let container: Container;
@@ -11,10 +10,8 @@ describe("InkRenderService", () => {
 
     beforeAll(() => {
         container = new Container;
-        container.loadAsync(bindings);
-        container.unbind(IRenderService);
-        container.bind(IRenderService).to(InkService);
-        sut = container.get(IRenderService);
+        container.load(bindings);
+        sut = container.getTagged(IRenderService, "ink", true);
     })
 
     beforeEach(() => {

@@ -3,15 +3,13 @@
 import "reflect-metadata";
 
 import { Container } from "inversify";
-import { IApp, IArgParser } from "./interfaces.js";
 import { bindings } from "./bindings.js";
+import { IApp, IArgParser } from "./interfaces.js";
 import { CliArgs } from "./types.js";
-import { buildProviderModule } from "inversify-binding-decorators";
 
 // Prepare DI
 const container = new Container();
-container.loadAsync(bindings);
-container.load(buildProviderModule())
+container.load(bindings);
 
 // Get args
 const argParser = container.get(IArgParser);

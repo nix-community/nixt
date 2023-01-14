@@ -1,9 +1,10 @@
-import { inject, injectable } from "inversify";
+import { inject } from "inversify";
+import { provide } from "inversify-binding-decorators";
 import { resolve } from "node:path";
 import { INixService, ITestRunner } from "../../interfaces.js";
 import { CliArgs, NixOptions, TestCase, TestFile, TestSuite } from "../../types.js";
 
-@injectable()
+@provide(ITestRunner)
 export class TestRunner implements ITestRunner {
     private _nixService: INixService;
 

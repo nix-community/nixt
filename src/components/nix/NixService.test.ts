@@ -11,7 +11,7 @@ describe("NixService", () => {
 
     beforeAll(() => {
         container = new Container;
-        container.loadAsync(bindings);
+        container.load(bindings);
         sut = container.get(INixService);
     })
 

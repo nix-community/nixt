@@ -1,4 +1,4 @@
-import { injectable } from "inversify";
+import { provide } from "inversify-binding-decorators";
 import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
@@ -11,7 +11,7 @@ const generateCallArgs = (a: {}) => {
         .map(([key, value]) => `${key} = "${value}";`);
 }
 
-@injectable()
+@provide(INixService)
 export class NixService implements INixService {
     public eval(file: string, options: NixOptions): any {
         const nixPath = resolve(`nix/${file}`);

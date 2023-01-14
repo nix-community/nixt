@@ -1,6 +1,6 @@
 import chokidar from "chokidar";
 
-import { inject } from "inversify";
+import { inject, tagged } from "inversify";
 import { provide } from "inversify-binding-decorators";
 import { IApp, IRenderService, ITestFinder, ITestRunner } from "./interfaces.js";
 import { CliArgs, TestFile } from "./types.js";
@@ -13,7 +13,7 @@ export class App implements IApp {
 
     public constructor(
         @inject(ITestRunner) testRunner: ITestRunner,
-        @inject(IRenderService) renderService: IRenderService,
+        @inject(IRenderService) @tagged("ink", false) renderService: IRenderService,
         @inject(ITestFinder) testFinder: ITestFinder
     ) {
         this._testRunner = testRunner;
