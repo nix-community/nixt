@@ -1,7 +1,6 @@
-export type Path = string;
-
 export type CliArgs = {
-    paths: Path[];
+    standalone: boolean;
+    paths: string[];
     watch: boolean;
     verbose: boolean[];
     list: boolean;
@@ -19,19 +18,20 @@ export type NixOptions = {
 };
 
 export type TestSpec = {
-    path: Path;
+    path: string;
     suites: {
         [key: string]: string[];
     };
 };
 
-export class TestCase {
-    name: string;
-    result?: boolean;
-    error?: string;
+export class TestFile {
+    path: string;
+    suites: TestSuite[];
+    importError?: string;
 
-    constructor(name: string) {
-        this.name = name;
+    constructor(path: string) {
+        this.path = path;
+        this.suites = [];
     }
 }
 
@@ -45,13 +45,12 @@ export class TestSuite {
     }
 }
 
-export class TestFile {
-    path: Path;
-    suites: TestSuite[];
-    importError?: string;
+export class TestCase {
+    name: string;
+    result?: boolean;
+    error?: string;
 
-    constructor(path: Path) {
-        this.path = path;
-        this.suites = [];
+    constructor(name: string) {
+        this.name = name;
     }
 }

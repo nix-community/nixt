@@ -22,6 +22,10 @@ Options
 `, {
       importMeta: import.meta,
       flags: {
+        standalone: {
+          type: 'boolean',
+          default: false,
+        },
         watch: {
           type: 'boolean',
           alias: 'w',
@@ -64,7 +68,7 @@ Options
       }
     } else {
       parsedArgs = {
-        paths: ["."],
+        paths: [],
         ...meowResult.flags
       }
     }

@@ -3,7 +3,7 @@ import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { INixService } from "../../interfaces.js";
-import { NixOptions, Path } from "../../types.js";
+import { NixOptions } from "../../types.js";
 
 const generateCallArgs = (a: {}) => {
     return Object
@@ -13,7 +13,7 @@ const generateCallArgs = (a: {}) => {
 
 @injectable()
 export class NixService implements INixService {
-    public eval(file: Path, options: NixOptions): any {
+    public eval(file: string, options: NixOptions): any {
         const nixPath = resolve(`nix/${file}`);
 
         if (!existsSync(nixPath)) {

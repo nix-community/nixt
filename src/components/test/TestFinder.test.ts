@@ -7,6 +7,7 @@ import { CliArgs } from "../../types.js";
 import path from "node:path";
 
 const defaultArgs = {
+    standalone: true,
     paths: ["."],
     watch: false,
     verbose: [false, false],
@@ -44,6 +45,7 @@ describe("ItFinder", () => {
         args.paths = ["__mocks__/invalid.test.nix"];
 
         const result = await sut.run(args)
+
         expect(result[0]).toBeDefined();
         expect(result[0]?.path).toStrictEqual(path.resolve("__mocks__/invalid.test.nix"));
         expect(result[0]?.suites).toStrictEqual([]);

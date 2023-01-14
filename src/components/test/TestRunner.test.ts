@@ -6,16 +6,6 @@ import { ITestFinder, ITestRunner } from "../../interfaces.js";
 import { CliArgs, TestFile } from "../../types.js";
 import path from "node:path";
 
-const defaultArgs = {
-    paths: ["."],
-    watch: false,
-    verbose: [false, false],
-    list: false,
-    recurse: false,
-    debug: false,
-    help: false
-};
-
 describe("TestRunner", () => {
     let container: Container;
     let args: CliArgs;
@@ -31,7 +21,16 @@ describe("TestRunner", () => {
 
     beforeEach(() => {
         container.snapshot();
-        args = defaultArgs;
+        args = {
+            standalone: false,
+            paths: [],
+            watch: false,
+            verbose: [false, false],
+            list: false,
+            recurse: false,
+            debug: false,
+            help: false
+        };
     })
 
     afterEach(() => {

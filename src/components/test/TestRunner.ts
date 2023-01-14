@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { resolve } from "node:path";
 import { INixService, ITestRunner } from "../../interfaces.js";
-import { CliArgs, NixOptions, Path, TestCase, TestFile, TestSuite } from "../../types.js";
+import { CliArgs, NixOptions, TestCase, TestFile, TestSuite } from "../../types.js";
 
 @injectable()
 export class TestRunner implements ITestRunner {
@@ -14,7 +14,7 @@ export class TestRunner implements ITestRunner {
     }
 
     private getTestCase(
-        file: Path,
+        file: string,
         testSuite: TestSuite["name"],
         testCase: TestCase["name"],
         trace: NixOptions["trace"]

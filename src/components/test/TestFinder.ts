@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { readdir, stat } from "node:fs/promises";
 import { resolve } from 'node:path';
 import { INixService, ITestFinder } from "../../interfaces.js";
-import { CliArgs, Path, TestCase, TestFile, TestSpec, TestSuite } from "../../types.js";
+import { CliArgs, TestCase, TestFile, TestSpec, TestSuite } from "../../types.js";
 
 @injectable()
 export class TestFinder implements ITestFinder {
@@ -14,8 +14,8 @@ export class TestFinder implements ITestFinder {
         this._nixService = nixService;
     }
 
-    private async getFiles(args: CliArgs, path: Path): Promise<Path[]> {
-        let files: Path[] = [];
+    private async getFiles(args: CliArgs, path: string): Promise<string[]> {
+        let files: string[] = [];
 
         try {
             const stats = await stat(path);
@@ -48,7 +48,7 @@ export class TestFinder implements ITestFinder {
     public async run(args: CliArgs): Promise<TestFile[]> {
         const testFiles: TestFile[] = [];
 
-        const getTestSpec = (f: Path): TestSpec => {
+        const getTestSpec = (file: string): TestSpec => {
             let traceArg = false;
             if (args.verbose[1]) traceArg = true;
 
@@ -56,7 +56,7 @@ export class TestFinder implements ITestFinder {
                 trace: traceArg,
                 debug: args.debug,
                 args: {
-                    path: resolve(f)
+                    path: resolve(file)
                 }
             });
 
@@ -64,10 +64,10 @@ export class TestFinder implements ITestFinder {
         }
 
         for (const p of args.paths) {
-            const absolutePath = resolve(p);
+            const absolutestring = resolve(p);
 
-            const files = await this.getFiles(args, absolutePath).then((fs) =>
-                fs.filter((p: Path) =>
+            const files = await this.getFiles(args, absolutestring).then((fs) =>
+                fs.filter((p: string) =>
                     p.endsWith(".test.nix")
                     || p.endsWith(".spec.nix")
                     || p.endsWith(".nixt")));
