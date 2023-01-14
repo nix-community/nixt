@@ -31,7 +31,7 @@
         "declarationMap": true,
         "esModuleInterop": true,
         "emitDecoratorMetadata": true,
-        "jsx": "preserve",
+        "jsx": "react",
         "experimentalDecorators": true,
         "skipLibCheck": true
     },

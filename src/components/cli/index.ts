@@ -1,3 +1,3 @@
 export * from "./ArgParser.js";
 export * from "./RenderService.js";
-export * from "./InkService.jsx";
+export * from "./InkService.js";
