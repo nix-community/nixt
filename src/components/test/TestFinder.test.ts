@@ -17,7 +17,7 @@ const defaultArgs = {
     help: false
 };
 
-describe("ItFinder", () => {
+describe("TestFinder", () => {
     let container: Container;
     let args: CliArgs;
     let sut: ITestFinder;
@@ -42,12 +42,12 @@ describe("ItFinder", () => {
     })
 
     it("handles import failures", async () => {
-        args.paths = ["__mocks__/invalid.test.nix"];
+        args.paths = ["examples/invalid.test.nix"];
 
         const result = await sut.run(args)
 
         expect(result[0]).toBeDefined();
-        expect(result[0]?.path).toStrictEqual(path.resolve("__mocks__/invalid.test.nix"));
+        expect(result[0]?.path).toStrictEqual(path.resolve("examples/invalid.test.nix"));
         expect(result[0]?.suites).toStrictEqual([]);
         expect(result[0]?.importError).toBeDefined();
     })

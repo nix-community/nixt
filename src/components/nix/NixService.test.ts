@@ -28,7 +28,7 @@ describe("NixService", () => {
     })
 
     it("returns nix results", () => {
-        const path = resolve("__mocks__/valid.nixt");
+        const path = resolve("examples/valid.nixt");
         const expected = {
             "path": path,
             "suites": {
