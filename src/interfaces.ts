@@ -4,10 +4,7 @@ import { CliArgs, NixOptions, TestFile } from "./types.js";
 @injectable()
 export abstract class IApp {
     abstract run(args: CliArgs): void;
-    abstract initializing(args: CliArgs): void;
-    abstract running(args: CliArgs, spec: TestFile[]): void;
     abstract watching(args: CliArgs, spec: TestFile[]): void;
-    abstract testing(args: CliArgs, spec: TestFile[]): void;
     abstract reporting(args: CliArgs, spec: TestFile[]): void;
 }
 
@@ -28,7 +25,7 @@ export abstract class ITestRunner {
 
 @injectable()
 export abstract class INixService {
-    abstract eval(path: string, options: NixOptions): any;
+    abstract run(target: string, options: NixOptions): any;
 }
 
 @injectable()

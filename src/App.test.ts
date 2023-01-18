@@ -2,39 +2,39 @@ import "reflect-metadata";
 
 import { Container } from "inversify";
 import { bindings } from "./bindings.js";
-import { IApp, IRenderService, ITestFinder, ITestRunner } from "./interfaces.js";
-import { CliArgs } from "./types.js";
+import { IApp, INixService, IRenderService, ITestFinder } from "./interfaces.js";
+import { CliArgs, Schema, TestFile } from "./types.js";
+
+const nixService = {
+    run: vi.fn(() => { return {} })
+}
+
+const renderService = {
+    run: vi.fn()
+}
+
+const testFinder = {
+    run: vi.fn(async (): Promise<TestFile[]> => { return [] })
+}
 
 describe("App", () => {
     let container: Container;
     let sut: IApp;
     let args: CliArgs;
-
-    const testFinder: ITestFinder = {
-        run: async () => { return []; }
-    }
-
-    const testRunner: ITestRunner = {
-        run: async () => { return []; }
-    }
-
-    const renderService: IRenderService = {
-        run: () => {}
-    }
+    let registry: Schema;
 
     beforeAll(() => {
         container = new Container();
         container.load(bindings);
-        container.rebind(ITestFinder).toConstantValue(testFinder);
-        container.rebind(ITestRunner).toConstantValue(testRunner);
+        container.rebind(INixService).toConstantValue(nixService);
         container.rebind(IRenderService).toConstantValue(renderService);
+        container.rebind(ITestFinder).toConstantValue(testFinder);
 
         sut = container.get(IApp);
     });
 
     beforeEach(() => {
         args = {
-            standalone: false,
             paths: [],
             watch: false,
             verbose: [false, false],
@@ -43,6 +43,27 @@ describe("App", () => {
             debug: false,
             help: false,
         };
+
+        registry = {
+            __schema: "v0.0",
+            settings: {
+                list: false,
+                watch: false,
+                verbose: false,
+                trace: false
+            },
+            testSpec: [{
+                path: "./dummy.nix",
+                suites: [{
+                    name: "Dummy",
+                    cases: [{
+                        name: "is a dummy suite",
+                        expressions: [true]
+                    }]
+                }]
+            }]
+        }
+
         container.snapshot();
     });
 
@@ -58,80 +79,64 @@ describe("App", () => {
     it("runs in standalone mode when a path is given", () => {
         args.paths = ["."];
 
-        const spy = vi.spyOn(sut, "running").mockImplementation(() => {});
-        let expected = args;
-        expected.standalone = true;
-
         sut.run(args);
 
-        expect(spy).toHaveBeenCalledWith(expected, []);
+        expect(testFinder.run).toHaveBeenCalledOnce();
     });
 
-    it("attempts to run in flake mode when no path is given", () => {
-        const spy = vi.spyOn(sut, "testing").mockImplementation(() => {});
-        let expected = args;
+    it("runs in flake mode when no path is given", () => {
+        nixService.run.mockReturnValueOnce(registry);
+        const spy = vi.spyOn(sut, "reporting").mockImplementation(() => {});
 
         sut.run(args);
 
-        expect(spy).toHaveBeenCalledWith(expected, []);
+        expect(testFinder.run).toHaveBeenCalledTimes(0);
+        expect(spy).toHaveBeenCalledWith(args, registry.testSpec);
     });
 
-    it.todo("runs in standalone mode when the nixt registry is inaccessible")
-    // it("runs in standalone mode when the nixt registry is inaccessible", () => {
-    //     const spy = vi.spyOn(sut, "testing").mockImplementation(() => {});
-    //     let expected = args;
-    //     expected.standalone = true;
-    //
-    //     sut.run(args);
-    //
-    //     expect(spy).toHaveBeenCalledWith(expected, []);
-    // });
-
-    it.todo("runs in standalone mode when the nixt registry is malformed")
-    // it("runs in standalone mode when the nixt registry is malformed", () => {
-    //     const spy = vi.spyOn(sut, "testing").mockImplementation(() => {});
-    //     let expected = args;
-    //     expected.standalone = true;
-    //
-    //     sut.run(args);
-    //
-    //     expect(spy).toHaveBeenCalledWith(expected, []);
-    // });
-
-    it.todo("runs in standalone mode when the nixt registry uses an unsupported schema")
-    // it("runs in standalone mode when the nixt registry uses an unsupported schema", () => {
-    //     const spy = vi.spyOn(sut, "testing").mockImplementation(() => {});
-    //     let expected = args;
-    //     expected.standalone = true;
-    //
-    //     sut.run(args);
-    //
-    //     expect(spy).toHaveBeenCalledWith(expected, []);
-    // });
-
-    it.todo("runs a test finder when in standalone mode");
-    // it("runs a test finder when in standalone mode", () => {
-    //     args.standalone = true;
-    //
-    //     sut.run(args);
-    //
-    //     expect(testFinder).toHaveBeenCalledOnce();
-    // });
-
-    it("calls test() once when watch is false", () => {
-        const spy = vi.spyOn(sut, "testing").mockImplementation(() => {});
+    it("runs in standalone mode when the nixt registry is inaccessible", () => {
+        const spy = vi.spyOn(sut, "reporting").mockImplementation(() => {});
 
         sut.run(args);
 
-        expect(spy).toHaveBeenCalledOnce();
+        expect(testFinder.run).toHaveBeenCalledOnce();
+        expect(spy).toHaveBeenCalledWith(args, []);
+    });
+
+    it("runs in standalone mode when the nixt registry is malformed", () => {
+        nixService.run.mockReturnValueOnce({ testSpec: "This isn't an array." });
+        const spy = vi.spyOn(sut, "reporting").mockImplementation(() => {});
+
+        sut.run(args);
+
+        expect(testFinder.run).toHaveBeenCalledOnce();
+        expect(spy).toHaveBeenCalledWith(args, []);
+    });
+
+    it("runs in standalone mode when the nixt registry uses an unsupported schema", () => {
+        registry.__schema = "v9001"
+        nixService.run.mockReturnValueOnce(registry);
+        const spy = vi.spyOn(sut, "reporting").mockImplementation(() => {});
+
+        sut.run(args);
+
+        expect(testFinder.run).toHaveBeenCalledOnce();
+        expect(spy).toHaveBeenCalledWith(args, []);
+    });
+
+    it("calls renderService once when watch is false", () => {
+        args.watch = false;
+
+        sut.run(args);
+
+        expect(renderService.run).toHaveBeenCalledOnce();
     })
 
-    it("calls test() for an initial run when watch is true", () => {
-        const spy = vi.spyOn(sut, "testing").mockImplementation(() => {});
+    it("calls renderService for an initial run when watch is true", async () => {
         args.watch = true;
 
         sut.run(args);
 
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(renderService.run).toHaveBeenCalled();
     })
 });

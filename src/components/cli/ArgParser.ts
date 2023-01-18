@@ -21,10 +21,6 @@ Options
 `, {
       importMeta: import.meta,
       flags: {
-        standalone: {
-          type: 'boolean',
-          default: false,
-        },
         watch: {
           type: 'boolean',
           alias: 'w',
@@ -70,11 +66,6 @@ Options
         paths: [],
         ...meowResult.flags
       }
-    }
-
-    if (parsedArgs.debug) {
-      console.log('--- Args ---');
-      console.log(parsedArgs);
     }
 
     return parsedArgs;

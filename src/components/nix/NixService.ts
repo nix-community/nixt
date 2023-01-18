@@ -1,6 +1,5 @@
 import { provide } from "inversify-binding-decorators";
 import { execSync } from "node:child_process";
-import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { INixService } from "../../interfaces.js";
 import { NixOptions } from "../../types.js";
@@ -13,12 +12,8 @@ const generateCallArgs = (a: {}) => {
 
 @provide(INixService)
 export class NixService implements INixService {
-    public eval(file: string, options: NixOptions): any {
-        const nixPath = resolve(`nix/${file}`);
-
-        if (!existsSync(nixPath)) {
-            throw new Error(`Path "${nixPath}" is invalid`);
-        };
+    public run(target: string, options: NixOptions): any {
+        const nixPath = resolve(`nix/${target}`);
 
         const args = options.args ? generateCallArgs(options.args) : [];
         const argsString = args.length > 0 ? `${args.join(' ')}` : '';

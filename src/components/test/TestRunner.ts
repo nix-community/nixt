@@ -20,7 +20,7 @@ export class TestRunner implements ITestRunner {
         testCase: TestCase["name"],
         trace: NixOptions["trace"]
     ) {
-        return this._nixService.eval("get-testcase.nix", {
+        return this._nixService.run("get-testcase.nix", {
             trace: trace,
             args: {
                 path: resolve(file),

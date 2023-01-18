@@ -28,13 +28,18 @@ describe("NixService", () => {
     })
 
     it("returns nix results", () => {
-        const p = resolve("__mocks__/valid.nixt");
-        const expected = { "path": p, "suites": { "Valid Tests": ["always passes"] } }
+        const path = resolve("__mocks__/valid.nixt");
+        const expected = {
+            "path": path,
+            "suites": {
+                "Valid Tests": ["always passes"]
+            }
+        }
 
-        const result = sut.eval("get-testspec.nix", {
+        const result = sut.run("get-testspec.nix", {
             trace: false,
             debug: false,
-            args: { path: p }
+            args: { path: path }
         })
 
         expect(result).toStrictEqual(expected)
@@ -42,7 +47,7 @@ describe("NixService", () => {
 
     it("throws error on invalid path", () => {
         function testSut() {
-            sut.eval("somePathWhichDoesNotExist", {
+            sut.run("somePathWhichDoesNotExist", {
                 trace: false,
                 debug: false,
                 args: { path: resolve("__mocks__/valid.nixt") }

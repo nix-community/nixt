@@ -53,7 +53,7 @@ export class TestFinder implements ITestFinder {
             let traceArg = false;
             if (args.verbose[1]) traceArg = true;
 
-            const spec = this._nixService.eval("get-testspec.nix", {
+            const spec = this._nixService.run("get-testspec.nix", {
                 trace: traceArg,
                 debug: args.debug,
                 args: {

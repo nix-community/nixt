@@ -1,78 +1,67 @@
 import chokidar from "chokidar";
-
 import { inject, tagged } from "inversify";
 import { provide } from "inversify-binding-decorators";
-import { IApp, IRenderService, ITestFinder, ITestRunner } from "./interfaces.js";
-import { CliArgs, TestFile } from "./types.js";
+import { IApp, INixService, IRenderService, ITestFinder } from "./interfaces.js";
+import { CliArgs, NixOptions, schema, TestFile } from "./types.js";
 
 @provide(IApp)
 export class App implements IApp {
-    private _testRunner: ITestRunner;
+    private _nixService: INixService;
     private _renderService: IRenderService;
     private _testFinder: ITestFinder;
 
     public constructor(
-        @inject(ITestRunner) testRunner: ITestRunner,
+        @inject(INixService) nixService: INixService,
         @inject(IRenderService) @tagged("ink", false) renderService: IRenderService,
         @inject(ITestFinder) testFinder: ITestFinder
     ) {
-        this._testRunner = testRunner;
+        this._nixService = nixService;
         this._renderService = renderService;
         this._testFinder = testFinder;
     }
 
     public run(args: CliArgs) {
-        this.initializing(args);
-    }
-
-    public initializing(args: CliArgs) {
+        let standalone: boolean = false;
+        let standaloneCause: string = "Unknown cause";
+        const schemaVer: string = "v0.0";
         let spec: TestFile[] = [];
+
+        const registry = schema.safeParse(this._nixService.run(".#__nixt", {} as NixOptions));
 
         // Run in standalone mode?
         if (args.paths.length > 0) {
-            args.standalone = true;
-            console.log("Path provided; running in standalone mode");
+            standalone = true;
+            standaloneCause = "Path provided";
+        } else if (registry.success === false) {
+            standalone = true;
+            args.paths = ["."];
+            standaloneCause = "nixt registry does not contain expected values";
+        } else if (registry.data.__schema !== schemaVer) {
+            standalone = true;
+            args.paths = ["."];
+            standaloneCause = `nixt schema version ${registry.data.__schema} is not ${schemaVer}`;
+        } else {
+            spec = registry.data.testSpec
         }
-        // else if (/*TODO: check here for failure to access __nixt*/) {
-        //     args.standalone = true;
-        //     args.paths = ["."];
-        //     console.log("Failed to access __nixt; running in standalone mode");
-        // }
 
-        this.running(args, spec);
-    }
+        if (standalone === true) {
+            console.log(`${standaloneCause}: running in standalone mode.`);
+            this._testFinder.run(args)
+                .then((testSpec: TestFile[]) => spec = testSpec);
+        }
 
-    public async running(args: CliArgs, spec: TestFile[]) {
-        let _spec: TestFile[];
-
-        args.standalone
-            ? _spec = await this._testFinder.run(args)
-            : _spec = spec;
-
+        // Watch?
         args.watch
-            ? this.watching(args, _spec)
-            : this.testing(args, _spec)
+            ? this.watching(args, spec)
+            : this.reporting(args, spec)
     }
 
     public watching(args: CliArgs, spec: TestFile[]) {
         const watcher = chokidar.watch(args.paths, { ignoreInitial: true });
-        if (args.list === true) {
+        this.reporting(args, spec);
+        watcher.on("all", () => {
             this.reporting(args, spec);
-            watcher.on("all", () => {
-                this.reporting(args, spec);
-            });
-        } else {
-            this.testing(args, spec);
-            watcher.on("all", () => {
-                this.testing(args, spec);
-            });
-        }
-    }
-
-    public async testing(args: CliArgs, spec: TestFile[]) {
-        const testedSpec = await this._testRunner.run(args, spec);
-
-        this.reporting(args, testedSpec)
+        });
     }
 
     public reporting(args: CliArgs, spec: TestFile[]) {

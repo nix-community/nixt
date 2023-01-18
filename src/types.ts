@@ -1,5 +1,34 @@
+import { z } from "zod";
+
+export const testCase = z.object({
+    name: z.string(),
+    expressions: z.boolean().array(),
+});
+
+export const testSuite = z.object({
+    name: z.string(),
+    cases: testCase.array(),
+});
+
+export const testFile = z.object({
+    path: z.string(),
+    suites: testSuite.array(),
+});
+
+export const schema = z.object({
+    __schema: z.string(),
+    settings: z.object({
+        list: z.boolean(),
+        watch: z.boolean(),
+        verbose: z.boolean(),
+        trace: z.boolean()
+    }),
+    testSpec: testFile.array(),
+}).required();
+
+export type Schema = z.infer<typeof schema>;
+
 export type CliArgs = {
-    standalone: boolean;
     paths: string[];
     watch: boolean;
     verbose: boolean[];
