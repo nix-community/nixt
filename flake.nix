@@ -35,11 +35,7 @@
         (nixago "configs")
 
         # lib
-        ## for external consumption
         (functions "nixt")
-        ## for cli use
-        (functions "standalone")
-        ## testing
         (data "tests")
       ];
     }
