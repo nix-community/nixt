@@ -41,7 +41,7 @@
     }
     {
       packages = std.harvest self ["app" "packages"];
-      devShells = std.harvest self ["app" "devshells"];
+      devShells = std.harvest self ["_automation" "devshells"];
       lib = std.pick self ["lib" "nixt"];
       __nixt = std.pick self ["lib" "tests"];
     };
