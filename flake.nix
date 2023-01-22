@@ -26,7 +26,7 @@
   } @ inputs:
     std.growOn {
       inherit inputs;
-      cellsFrom = ./cells;
+      cellsFrom = ./nix;
       cellBlocks = with std.blockTypes; [
         # app
         (installables "packages" {ci.build = true;})
