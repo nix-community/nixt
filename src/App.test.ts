@@ -3,7 +3,7 @@ import "reflect-metadata";
 import { Container } from "inversify";
 import { bindings } from "./bindings.js";
 import { IApp, INixService, IRenderService, ITestFinder } from "./interfaces.js";
-import { CliArgs, Schema, TestFile } from "./types.js";
+import { CliArgs, Schema, schemaVer, TestFile } from "./types.js";
 
 const nixService = {
     run: vi.fn(() => { return {} })
@@ -25,6 +25,7 @@ describe("App", () => {
 
     beforeAll(() => {
         container = new Container();
+
         container.load(bindings);
         container.rebind(INixService).toConstantValue(nixService);
         container.rebind(IRenderService).toConstantValue(renderService);
@@ -45,7 +46,7 @@ describe("App", () => {
         };
 
         registry = {
-            __schema: "v0.0",
+            __schema: schemaVer,
             settings: {
                 list: false,
                 watch: false,
@@ -76,58 +77,57 @@ describe("App", () => {
         expect(sut).toBeDefined();
     });
 
-    it("runs in standalone mode when a path is given", () => {
+    it("runs in standalone mode when a path is given", async () => {
         args.paths = ["."];
 
-        sut.run(args);
+        await sut.run(args);
 
         expect(testFinder.run).toHaveBeenCalledOnce();
     });
 
-    it("runs in flake mode when no path is given", () => {
+    it("runs in flake mode when no path is given", async () => {
         nixService.run.mockReturnValueOnce(registry);
-        const spy = vi.spyOn(sut, "reporting").mockImplementation(() => {});
 
-        sut.run(args);
+        await sut.run(args);
 
         expect(testFinder.run).toHaveBeenCalledTimes(0);
-        expect(spy).toHaveBeenCalledWith(args, registry.testSpec);
+        expect(renderService.run).toHaveBeenCalledWith(args, registry.testSpec);
     });
 
-    it("runs in standalone mode when the nixt registry is inaccessible", () => {
-        const spy = vi.spyOn(sut, "reporting").mockImplementation(() => {});
+    it("runs in standalone mode when the nixt registry is inaccessible", async () => {
+        nixService.run.mockImplementationOnce(() => {
+            throw new Error("error: Dummy error");
+        })
 
-        sut.run(args);
+        await sut.run(args);
 
         expect(testFinder.run).toHaveBeenCalledOnce();
-        expect(spy).toHaveBeenCalledWith(args, []);
+        expect(renderService.run).toHaveBeenCalledWith(args, []);
     });
 
-    it("runs in standalone mode when the nixt registry is malformed", () => {
-        nixService.run.mockReturnValueOnce({ testSpec: "This isn't an array." });
-        const spy = vi.spyOn(sut, "reporting").mockImplementation(() => {});
+    it("runs in standalone mode when the nixt registry is malformed", async () => {
+        nixService.run.mockReturnValueOnce({ __schema: schemaVer, testSpec: "This isn't an array." });
 
-        sut.run(args);
+        await sut.run(args);
 
         expect(testFinder.run).toHaveBeenCalledOnce();
-        expect(spy).toHaveBeenCalledWith(args, []);
+        expect(renderService.run).toHaveBeenCalledWith(args, []);
     });
 
-    it("runs in standalone mode when the nixt registry uses an unsupported schema", () => {
+    it("runs in standalone mode when the nixt registry uses an unsupported schema", async () => {
         registry.__schema = "v9001"
         nixService.run.mockReturnValueOnce(registry);
-        const spy = vi.spyOn(sut, "reporting").mockImplementation(() => {});
 
-        sut.run(args);
+        await sut.run(args);
 
         expect(testFinder.run).toHaveBeenCalledOnce();
-        expect(spy).toHaveBeenCalledWith(args, []);
+        expect(renderService.run).toHaveBeenCalledWith(args, []);
     });
 
-    it("calls renderService once when watch is false", () => {
+    it("calls renderService once when watch is false", async () => {
         args.watch = false;
 
-        sut.run(args);
+        await sut.run(args);
 
         expect(renderService.run).toHaveBeenCalledOnce();
     })
@@ -135,7 +135,7 @@ describe("App", () => {
     it("calls renderService for an initial run when watch is true", async () => {
         args.watch = true;
 
-        sut.run(args);
+        await sut.run(args);
 
         expect(renderService.run).toHaveBeenCalled();
     })

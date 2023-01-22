@@ -5,16 +5,23 @@ export const testCase = z.object({
     expressions: z.boolean().array(),
 });
 
+export type TestCase = z.infer<typeof testCase>;
+
 export const testSuite = z.object({
     name: z.string(),
     cases: testCase.array(),
 });
+
+export type TestSuite = z.infer<typeof testSuite>;
 
 export const testFile = z.object({
     path: z.string(),
     suites: testSuite.array(),
 });
 
+export type TestFile = z.infer<typeof testFile>;
+
+export const schemaVer = "v0.0";
 export const schema = z.object({
     __schema: z.string(),
     settings: z.object({
@@ -37,49 +44,3 @@ export type CliArgs = {
     debug: boolean;
     help: boolean;
 };
-
-export type NixOptions = {
-    attr?: string;
-    strict?: boolean;
-    trace: boolean;
-    debug?: boolean;
-    args?: {};
-};
-
-export type TestSpec = {
-    path: string;
-    suites: {
-        [key: string]: string[];
-    };
-};
-
-export class TestFile {
-    path: string;
-    suites: TestSuite[];
-    importError?: string;
-
-    constructor(path: string) {
-        this.path = path;
-        this.suites = [];
-    }
-}
-
-export class TestSuite {
-    name: string;
-    cases: TestCase[];
-
-    constructor(name: string) {
-        this.name = name;
-        this.cases = [];
-    }
-}
-
-export class TestCase {
-    name: string;
-    result?: boolean;
-    error?: string;
-
-    constructor(name: string) {
-        this.name = name;
-    }
-}

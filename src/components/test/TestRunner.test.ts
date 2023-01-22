@@ -22,7 +22,6 @@ describe("TestRunner", () => {
     beforeEach(() => {
         container.snapshot();
         args = {
-            standalone: false,
             paths: [],
             watch: false,
             verbose: [false, false],

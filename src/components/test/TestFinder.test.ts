@@ -7,7 +7,6 @@ import { ITestFinder } from "../../interfaces.js";
 import { CliArgs } from "../../types.js";
 
 const defaultArgs = {
-    standalone: true,
     paths: ["."],
     watch: false,
     verbose: [false, false],

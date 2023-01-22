@@ -1,9 +1,13 @@
 import "reflect-metadata";
 
 import { Container } from "inversify";
-import { resolve } from "node:path";
 import { bindings } from "../../bindings.js";
 import { INixService } from "../../interfaces.js";
+import { execSync } from "node:child_process";
+
+vi.mock("node:child_process", () => ({
+    execSync: vi.fn()
+}));
 
 describe("NixService", () => {
     let container: Container;
@@ -21,38 +25,48 @@ describe("NixService", () => {
 
     afterEach(() => {
         container.restore();
+        vi.restoreAllMocks();
     })
 
     it("is defined", () => {
         expect(sut).toBeDefined();
     })
 
-    it("returns nix results", () => {
-        const path = resolve("examples/valid.nixt");
-        const expected = {
-            "path": path,
-            "suites": {
-                "Valid Tests": ["always passes"]
-            }
-        }
+    it("returns an object", () => {
+        const expected = `{
+            "__schema": "v0.0",
+            "settings": {
+                "list": false,
+                "watch": false,
+                "verbose": false,
+                "trace": false
+            },
+            "testSpec": [{
+                "path": "./dummy.nix",
+                "suites": [{
+                    "name": "Dummy",
+                    "cases": [{
+                        "name": "is a dummy suite",
+                        "expressions": [true]
+                    }]
+                }]
+            }]
+        }`
 
-        const result = sut.run("get-testspec.nix", {
-            trace: false,
-            debug: false,
-            args: { path: path }
+        execSync.mockImplementationOnce((command: string) => {
+            if (command.includes(".#__nixt") === true) return expected
+            return {};
         })
 
-        expect(result).toStrictEqual(expected)
+        const result = sut.run(".#__nixt", false)
+
+        expect(result).toStrictEqual(JSON.parse(expected))
     })
 
-    it("throws error on invalid path", () => {
-        function testSut() {
-            sut.run("somePathWhichDoesNotExist", {
-                trace: false,
-                debug: false,
-                args: { path: resolve("__mocks__/valid.nixt") }
-            })
-        }
-        expect(testSut).toThrow(Error);
+    it("throws on invalid target", () => {
+        const dummyError = "error: Dummy error";
+        execSync.mockReturnValueOnce(dummyError);
+
+        expect(sut.run).toThrowError(dummyError);
     })
 })
