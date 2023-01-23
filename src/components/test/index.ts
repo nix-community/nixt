@@ -1,2 +1,1 @@
-export * from "./TestFinder.js"
-export * from "./TestRunner.js"
+export * from "./TestService.js"

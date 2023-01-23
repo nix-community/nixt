@@ -2,7 +2,7 @@ import "reflect-metadata";
 
 import { Container } from "inversify";
 import { bindings } from "./bindings.js";
-import { IApp, INixService, IRenderService, ITestFinder } from "./interfaces.js";
+import { IApp, INixService, IRenderService, TestService } from "./interfaces.js";
 import { CliArgs, Schema, schemaVer, TestFile } from "./types.js";
 
 const nixService = {
@@ -13,7 +13,7 @@ const renderService = {
     run: vi.fn()
 }
 
-const testFinder = {
+const testService = {
     run: vi.fn(async (): Promise<TestFile[]> => { return [] })
 }
 
@@ -29,7 +29,7 @@ describe("App", () => {
         container.load(bindings);
         container.rebind(INixService).toConstantValue(nixService);
         container.rebind(IRenderService).toConstantValue(renderService);
-        container.rebind(ITestFinder).toConstantValue(testFinder);
+        container.rebind(TestService).toConstantValue(testService);
 
         sut = container.get(IApp);
     });
@@ -82,7 +82,7 @@ describe("App", () => {
 
         await sut.run(args);
 
-        expect(testFinder.run).toHaveBeenCalledOnce();
+        expect(testService.run).toHaveBeenCalledOnce();
     });
 
     it("runs in flake mode when no path is given", async () => {
@@ -90,7 +90,7 @@ describe("App", () => {
 
         await sut.run(args);
 
-        expect(testFinder.run).toHaveBeenCalledTimes(0);
+        expect(testService.run).toHaveBeenCalledTimes(0);
         expect(renderService.run).toHaveBeenCalledWith(args, registry.testSpec);
     });
 
@@ -101,7 +101,7 @@ describe("App", () => {
 
         await sut.run(args);
 
-        expect(testFinder.run).toHaveBeenCalledOnce();
+        expect(testService.run).toHaveBeenCalledOnce();
         expect(renderService.run).toHaveBeenCalledWith(args, []);
     });
 
@@ -110,7 +110,7 @@ describe("App", () => {
 
         await sut.run(args);
 
-        expect(testFinder.run).toHaveBeenCalledOnce();
+        expect(testService.run).toHaveBeenCalledOnce();
         expect(renderService.run).toHaveBeenCalledWith(args, []);
     });
 
@@ -120,7 +120,7 @@ describe("App", () => {
 
         await sut.run(args);
 
-        expect(testFinder.run).toHaveBeenCalledOnce();
+        expect(testService.run).toHaveBeenCalledOnce();
         expect(renderService.run).toHaveBeenCalledWith(args, []);
     });
 

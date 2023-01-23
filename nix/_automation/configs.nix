@@ -10,17 +10,13 @@ in {
       root = true;
 
       "*" = {
-        end_of_line = "lf";
-        insert_final_newline = true;
-        trim_trailing_whitespace = true;
         charset = "utf-8";
-        indent_style = "space";
+        end_of_line = "lf";
         indent_size = 2;
-      };
-
-      "*.{tsx?,jsx?,json}" = {
+        indent_style = "space";
+        insert_final_newline = true;
         max_line_length = 120;
-        indent_size = 4;
+        trim_trailing_whitespace = true;
       };
 
       "*.md" = {
@@ -31,17 +27,17 @@ in {
       "*.{diff,patch}" = {
         end_of_line = "unset";
         insert_final_newline = "unset";
-        trim_trailing_whitespace = "unset";
         indent_size = "unset";
+        trim_trailing_whitespace = "unset";
       };
 
       "{LICENSES/**,LICENSE,*.lock,package-lock.json}" = {
+        charset = "unset";
         end_of_line = "unset";
+        indent_size = "unset";
+        indent_style = "unset";
         insert_final_newline = "unset";
         trim_trailing_whitespace = "unset";
-        charset = "unset";
-        indent_style = "unset";
-        indent_size = "unset";
       };
     };
     hook.mode = "copy";
