@@ -14,7 +14,7 @@ export class App implements IApp {
   public constructor(
     @inject(INixService) nixService: INixService,
     @inject(IRenderService) @tagged("ink", false) renderService: IRenderService,
-    @inject(TestService) testService: ITestFinder
+    @inject(TestService) testService: TestService
   ) {
     this._nixService = nixService;
     this._renderService = renderService;
@@ -49,7 +49,7 @@ export class App implements IApp {
     let result: Schema;
 
     try {
-      const registry = schema.safeParse(this._nixService.run(".#__nixt", false));
+      const registry = schema.safeParse(this._nixService.fetch(".#__nixt", false));
 
       if (args.paths.length > 0 || registry.success === false || registry.data.__schema !== schemaVer) {
         if (args.paths.length > 0) console.log("Path provided: standalone mode")

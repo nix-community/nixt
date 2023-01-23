@@ -1,5 +1,7 @@
 import { inject } from "inversify";
 import { provide } from "inversify-binding-decorators";
+import { stat, readdir } from "node:fs/promises";
+import { resolve } from "node:path";
 import { INixService, TestService } from "../../interfaces.js";
 import { CliArgs, TestFile } from "../../types.js";
 
@@ -13,93 +15,62 @@ export class TestFinder implements TestService {
     this._nixService = nixService;
   }
 
-  private async run(args: CliArgs): Promise<TestFile[]> {
+  public async run(args: CliArgs): Promise<TestFile[]> {
     let spec: TestFile[] = [];
 
+    for (const path of args.paths) {
+      const absolutePath = resolve(path);
 
+      const files = await this.getFiles(args, absolutePath).then((files) =>
+        files.filter((path) =>
+          path.endsWith(".test.nix")
+          || path.endsWith(".spec.nix")
+        ));
+
+      for (const file of files) {
+        let testFile: TestFile;
+
+        try {
+          testFile = await this._nixService.inject(file, args.verbose[1]!)
+        } catch (error: any) {
+          throw new Error(error)
+        }
+
+        spec.push(testFile)
+      }
+    }
 
     return spec
   }
-  // private async getFiles(args: CliArgs, path: string): Promise<string[]> {
-  //     let files: string[] = [];
 
-  //     try {
-  //         const stats = await stat(path);
+  private async getFiles(args: CliArgs, path: string): Promise<string[]> {
+    let files: string[] = [];
 
-  //         if (stats.isFile()) files = [path];
+    try {
+      const stats = await stat(path);
 
-  //         if (stats.isDirectory()) {
-  //             const read = await readdir(path).then((fs) => fs.map((f) => `${path}/${f}`));
+      if (stats.isFile()) files = [path];
 
-  //             files = read.filter((f) => stat(f).then((f) => f.isFile()));
-  //             const dirs = read.filter((f) => stat(f).then((f) => f.isDirectory()));
+      if (stats.isDirectory()) {
+        const read = await readdir(path).then((files) => files.map((file) => `${path}/${file}`));
 
-  //             if (args.recurse && dirs.length > 0) {
-  //                 const newFiles = await Promise.all(dirs.map((d) => this.getFiles(args, d)));
-  //                 files = files.concat(newFiles.flat());
-  //             }
-  //         }
-  //     } catch (e: any) {
-  //         if (e.code === "ENOENT") {
-  //             console.log(`File does not exist: ${path}`);
-  //         }
-  //         else {
-  //             console.log(`IO error: ${e.code}`);
-  //         }
-  //     }
+        files = read.filter((file) => stat(file).then((file) => file.isFile()));
+        const dirs = read.filter((file) => stat(file).then((file) => file.isDirectory()));
 
-  //     return files;
-  // }
+        if (args.recurse && dirs.length > 0) {
+          const newFiles = await Promise.all(dirs.map((dir) => this.getFiles(args, dir)));
+          files = files.concat(newFiles.flat());
+        }
+      }
+    } catch (error: any) {
+      if (error.code === "ENOENT") {
+        console.log(`File does not exist: ${path}`);
+      }
+      else {
+        console.log(`IO error: ${error.code}`);
+      }
+    }
 
-  // public async run(args: CliArgs): Promise<TestFile[]> {
-  //     const testFiles: TestFile[] = [];
-
-  //     const getTestSpec = (file: string): TestSpec => {
-  //         let traceArg = false;
-  //         if (args.verbose[1]) traceArg = true;
-
-  //         const spec = this._nixService.run("get-testspec.nix", {
-  //             trace: traceArg,
-  //             debug: args.debug,
-  //             args: {
-  //                 path: resolve(file)
-  //             }
-  //         });
-
-  //         return spec;
-  //     }
-
-  //     for (const p of args.paths) {
-  //         const absolutestring = resolve(p);
-
-  //         const files = await this.getFiles(args, absolutestring).then((fs) =>
-  //             fs.filter((p: string) =>
-  //                 p.endsWith(".test.nix")
-  //                 || p.endsWith(".spec.nix")
-  //                 || p.endsWith(".nixt")));
-
-  //         for (const file of files) {
-  //             if (args.debug) console.log(`Found file: ${file}`);
-  //             const testFile = new TestFile(file);
-
-  //             try {
-  //                 const { suites } = getTestSpec(file);
-  //                 for (const [suiteName, cases] of Object.entries(suites)) {
-  //                     const testSuite = new TestSuite(suiteName);
-  //                     testFile.suites.push(testSuite);
-  //                     for (const caseName of cases) {
-  //                         const testCase = new TestCase(caseName);
-  //                         testSuite.cases.push(testCase);
-  //                     }
-  //                 }
-  //             } catch (e: any) {
-  //                 if (args.debug) console.log(`Import error!\n  ${e.message}`);
-  //                 testFile.importError = e.message;
-  //             }
-  //             testFiles.push(testFile);
-  //         }
-  //     }
-
-  //     return testFiles;
-  // }
+    return files;
+  }
 }

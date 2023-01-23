@@ -18,7 +18,8 @@ export abstract class TestService {
 
 @injectable()
 export abstract class INixService {
-  abstract run(target: string, trace: boolean, args?: {}): any;
+  abstract fetch(target: string, trace: boolean): any;
+  abstract inject(target: string, trace: boolean): any;
 }
 
 @injectable()

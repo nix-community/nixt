@@ -2,29 +2,38 @@ import { provide } from "inversify-binding-decorators";
 import { execSync } from "node:child_process";
 import { INixService } from "../../interfaces.js";
 
-const generateCallArgs = (args: {}): string[] => {
-    return Object
-        .entries(args)
-        .map(([key, value]) => `--arg ${key} ${value}`);
+const runCommand = (command: string) => {
+  const result = execSync(command, {
+    stdio: ["pipe", "pipe", "pipe"]
+  }).toString();
+
+  if (result.startsWith("error:") === true) {
+    throw new Error(result)
+  }
+
+  const parsed = JSON.parse(result);
+
+  return parsed;
 }
 
 @provide(INixService)
 export class NixService implements INixService {
-    public run(target: string, trace: boolean, args?: {}): any {
-        const _args = args ? generateCallArgs(args).join(" ") : "";
-        const traceString = trace ? `--show-trace` : '';
-        const command = `nix eval --json ${traceString} ${target} ${_args}'`;
+  public fetch(target: string, trace: boolean): any {
+    const traceString = trace ? `--show-trace` : '';
+    const command = `nix eval --json ${traceString} ${target}`;
 
-        const result = execSync(command, {
-            stdio: ["pipe", "pipe", "pipe"]
-        }).toString();
+    const parsed = runCommand(command);
 
-        if (result.startsWith("error:") === true) {
-            throw new Error(result)
-        }
+    return parsed;
+  }
 
-        const parsed = JSON.parse(result);
+  public inject(target: string, trace: boolean): any {
+    const traceString = trace ? `--show-trace` : '';
+    const command = `nix eval --json --impure ${traceString} --expr \
+'let inherit (import ./default.nix) lib; in lib.inject ${target}'`;
 
-        return parsed;
-    }
+    const parsed = runCommand(command);
+
+    return parsed;
+  }
 }
