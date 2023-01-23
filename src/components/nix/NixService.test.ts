@@ -5,10 +5,13 @@ import { bindings } from "../../bindings.js";
 import { INixService } from "../../interfaces.js";
 import { execSync } from "node:child_process";
 import { schemaVer } from "../../types.js";
+import { Mock } from "vitest";
 
 vi.mock("node:child_process", () => ({
   execSync: vi.fn()
 }));
+
+const mockExecSync = execSync as Mock;
 
 describe("NixService", () => {
   let registry: string
@@ -55,7 +58,7 @@ describe("NixService", () => {
   })
 
   it("returns an object when fetching", () => {
-    execSync.mockImplementationOnce((command: string) => {
+    mockExecSync.mockImplementationOnce((command: string) => {
       if (command.includes(".#__nixt") === true) return registry
       return {};
     })
@@ -66,7 +69,7 @@ describe("NixService", () => {
   })
 
   it("returns an object when injecting", () => {
-    execSync.mockImplementationOnce((command: string) => {
+    mockExecSync.mockImplementationOnce((command: string) => {
       if (command.includes("./dummy.spec.nix") === true) return registry
       return {};
     })
@@ -78,7 +81,7 @@ describe("NixService", () => {
 
   it("throws on invalid target", () => {
     const dummyError = "error: Dummy error";
-    execSync.mockReturnValue(dummyError);
+    mockExecSync.mockReturnValue(dummyError);
 
     expect(sut.fetch).toThrowError(dummyError);
     expect(sut.inject).toThrowError(dummyError);

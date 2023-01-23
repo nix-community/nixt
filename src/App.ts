@@ -19,7 +19,7 @@ export class App implements IApp {
     this._nixService = nixService;
     this._renderService = renderService;
     this._testService = testService;
-    this.watcher = chokidar.watch([], false)
+    this.watcher = chokidar.watch([], { ignoreInitial: true })
   }
 
   // TODO: Watch both test and non-test files when using registry.

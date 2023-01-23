@@ -4,7 +4,6 @@ import { Container } from "inversify";
 import { bindings } from "../../bindings.js";
 import { INixService, TestService } from "../../interfaces.js";
 import { CliArgs, TestFile } from "../../types.js";
-import { resolve } from "path";
 
 const nixService = {
   fetch: vi.fn(),
