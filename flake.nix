@@ -9,7 +9,7 @@
 
     std.url = "github:divnix/std";
 
-    nixpkgs.url = "nixpkgs";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     yants.url = "github:divnix/yants";
 

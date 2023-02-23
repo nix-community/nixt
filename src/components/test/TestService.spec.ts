@@ -4,6 +4,7 @@ import { Container } from "inversify";
 import { bindings } from "../../bindings.js";
 import { INixService, TestService } from "../../interfaces.js";
 import { CliArgs, TestFile } from "../../types.js";
+import { resolve } from "path";
 
 const nixService = {
   fetch: vi.fn(),
@@ -90,5 +91,22 @@ describe("TestService", () => {
     expect(result).toStrictEqual(dummySpec);
   })
 
-  it.todo("handles NixService errors");
+  it("handles NixService errors", async () => {
+    nixService.inject.mockImplementationOnce(async () => {
+      throw new Error('error: something went wrong')
+    });
+    const path = "./examples/valid.spec.nix";
+    args.paths = [path];
+
+    const result = await sut.run(args);
+
+    dummySpec = [
+      {
+        path: resolve(path),
+        suites: [],
+        importError: 'error: something went wrong'
+      }
+    ]
+    expect(result).toEqual(dummySpec);
+  });
 });

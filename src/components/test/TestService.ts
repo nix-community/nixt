@@ -28,15 +28,20 @@ export class TestFinder implements TestService {
         ));
 
       for (const file of files) {
-        let testFile: TestFile;
+        let testedFile: TestFile;
 
-        try {
-          testFile = await this._nixService.inject(file, args.verbose[1]!)
-        } catch (error: any) {
-          throw new Error(error)
+        testedFile = {
+          path: absolutePath,
+          suites: [],
         }
 
-        spec.push(testFile)
+        try {
+          testedFile = await this._nixService.inject(file, args.verbose[1]!)
+        } catch (error: any) {
+          testedFile.importError = error.message;
+        }
+
+        spec.push(testedFile)
       }
     }
 
