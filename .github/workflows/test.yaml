@@ -42,4 +42,4 @@ jobs:
           nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Run nixt
-        run: nix run . -- nix
+        run: nix run .
