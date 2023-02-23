@@ -146,7 +146,7 @@ export class RenderService implements IRenderService {
 
   private renderResult(args: CliArgs, testCase: TestCase, lastCase: boolean, lastSuite: boolean): void {
     let glyph: string;
-    if (testCase.error) {
+    if (testCase.error || !reduceExpressions(testCase)) {
       process.exitCode = 1
     }
 
