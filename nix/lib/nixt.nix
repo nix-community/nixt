@@ -10,7 +10,7 @@
   Schema = struct "Schema" {
     __schema = string;
     settings = Settings;
-    testSpec = list TestFile;
+    testSpec = list Block;
   };
 
   Settings = struct "Settings" {
@@ -20,7 +20,7 @@
     trace = bool;
   };
 
-  TestFile = struct "TestFile" {
+  Block = struct "Block" {
     path = path;
     suites = list TestSuite;
   };
@@ -39,7 +39,7 @@ in {
   grow =
     defun [
       (struct {
-        blocks = list TestFile;
+        blocks = list Block;
         settings = option Settings;
       })
       Schema
@@ -61,7 +61,7 @@ in {
         }
     );
 
-  # Generates test files
+  # Generates test blocks
   block = let
     # Prepares test cases for describe consumption
     it =
@@ -88,10 +88,10 @@ in {
           }
       );
   in
-    defun [path (attrs (attrs (either bool (list bool)))) TestFile]
+    defun [path (attrs (attrs (either bool (list bool)))) Block]
     (
       path: suites:
-        TestFile {
+        Block {
           inherit path;
           suites = lib.mapAttrsToList (name: cases: describe name cases) suites;
         }
