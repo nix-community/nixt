@@ -9,7 +9,9 @@
 
     std.url = "github:divnix/std";
 
-    nixpkgs.url = "nixpkgs";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+
+    yants.url = "github:divnix/yants";
 
     dream2nix = {
       url = "github:nix-community/dream2nix";
@@ -18,22 +20,29 @@
   };
 
   outputs = {
-      std,
-      self,
-      ...
+    std,
+    self,
+    ...
   } @ inputs:
     std.growOn {
       inherit inputs;
-      cellsFrom = ./cells;
+      cellsFrom = ./nix;
       cellBlocks = with std.blockTypes; [
+        # app
         (installables "packages" {ci.build = true;})
         (devshells "devshells")
         (functions "dream2nix")
         (nixago "configs")
+
+        # lib
+        (functions "nixt")
+        (data "tests")
       ];
     }
-      {
-        packages = std.harvest self ["nixt" "packages"];
-        devShells = std.harvest self ["nixt" "devshells"];
-      };
+    {
+      packages = std.harvest self ["app" "packages"];
+      devShells = std.harvest self ["_automation" "devshells"];
+      lib = std.pick self ["lib" "nixt"];
+      __nixt = std.pick self ["lib" "tests"];
+    };
 }

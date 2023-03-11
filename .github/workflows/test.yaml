@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  jest:
+  node:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,9 +27,9 @@ jobs:
           cache: "npm"
 
       - run: npm ci
-      - name: Run Jest
+      - name: Run vitest
         run: npm t
-  nixt:
+  nix:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -41,5 +41,5 @@ jobs:
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - name: Run Nixt
-        run: nix run . -- nix
+      - name: Run nixt
+        run: nix run .

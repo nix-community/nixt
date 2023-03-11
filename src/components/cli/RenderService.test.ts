@@ -10,8 +10,8 @@ describe("RenderService", () => {
 
   beforeAll(() => {
     container = new Container;
-    container.loadAsync(bindings);
-    sut = container.get(IRenderService);
+    container.load(bindings);
+    sut = container.getTagged(IRenderService, "ink", false);
   })
 
   beforeEach(() => {

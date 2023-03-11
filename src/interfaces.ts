@@ -1,34 +1,28 @@
 import { injectable } from "inversify";
-import { CliArgs, NixOptions, Path, TestFile } from "./types.js";
+import { CliArgs, TestFile } from "./types.js";
 
 @injectable()
 export abstract class IApp {
-    abstract run(args: CliArgs): void;
-    abstract watch(args: CliArgs): void;
-    abstract test(args: CliArgs): void;
+  abstract run(args: CliArgs): Promise<void>;
 }
 
 @injectable()
 export abstract class IArgParser {
-    abstract run(): CliArgs;
+  abstract run(): CliArgs;
 }
 
 @injectable()
-export abstract class ITestFinder {
-    abstract run(args: CliArgs): Promise<TestFile[]>;
-}
-
-@injectable()
-export abstract class ITestRunner {
-    abstract run(args: CliArgs, testFiles: TestFile[]): Promise<TestFile[]>;
+export abstract class TestService {
+  abstract run(args: CliArgs): Promise<TestFile[]>;
 }
 
 @injectable()
 export abstract class INixService {
-    abstract eval(path: Path, options: NixOptions): any;
+  abstract fetch(target: string, trace: boolean): any;
+  abstract inject(target: string, trace: boolean): any;
 }
 
 @injectable()
 export abstract class IRenderService {
-    abstract run(args: CliArgs, testFiles: TestFile[]): void;
+  abstract run(args: CliArgs, testFiles: TestFile[]): void;
 }

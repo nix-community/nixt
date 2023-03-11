@@ -1,78 +1,143 @@
 import "reflect-metadata";
 
-import { jest } from "@jest/globals";
 import { Container } from "inversify";
 import { bindings } from "./bindings.js";
-import { IApp, IRenderService, ITestFinder, ITestRunner } from "./interfaces.js";
-import { CliArgs } from "./types.js";
+import { IApp, INixService, IRenderService, TestService } from "./interfaces.js";
+import { CliArgs, Schema, schemaVer, TestFile } from "./types.js";
+
+const nixService = {
+  fetch: vi.fn(() => { return {} }),
+  inject: vi.fn(() => { return {} })
+}
+
+const renderService = {
+  run: vi.fn()
+}
+
+const testService = {
+  run: vi.fn(async (): Promise<TestFile[]> => { return [] })
+}
 
 describe("App", () => {
-    let container: Container;
-    let sut: IApp;
-    let args: CliArgs
+  let container: Container;
+  let sut: IApp;
+  let args: CliArgs;
+  let registry: Schema;
 
-    const testFinder: ITestFinder = {
-        run: async () => { return []; }
+  beforeAll(() => {
+    container = new Container();
+
+    container.load(bindings);
+    container.rebind(INixService).toConstantValue(nixService);
+    container.rebind(IRenderService).toConstantValue(renderService);
+    container.rebind(TestService).toConstantValue(testService);
+
+    sut = container.get(IApp);
+  });
+
+  beforeEach(() => {
+    args = {
+      paths: [],
+      watch: false,
+      verbose: [false, false],
+      list: false,
+      recurse: false,
+      debug: false,
+      help: false,
+    };
+
+    registry = {
+      __schema: schemaVer,
+      settings: {
+        list: false,
+        watch: false,
+        verbose: false,
+        trace: false
+      },
+      testSpec: [{
+        path: "./dummy.nix",
+        suites: [{
+          name: "Dummy",
+          cases: [{
+            name: "is a dummy suite",
+            expressions: [true]
+          }]
+        }]
+      }]
     }
 
-    const testRunner: ITestRunner = {
-        run: async () => { return []; }
-    }
+    container.snapshot();
+  });
 
-    const renderService: IRenderService = {
-        run: () => {}
-    }
+  afterEach(() => {
+    container.restore();
+    vi.restoreAllMocks();
+  });
 
-    beforeAll(() => {
-        container = new Container();
-        container.loadAsync(bindings);
-        container.rebind(ITestFinder).toConstantValue(testFinder);
-        container.rebind(ITestRunner).toConstantValue(testRunner);
-        container.rebind(IRenderService).toConstantValue(renderService);
-        sut = container.get(IApp);
-    });
+  it("is defined", () => {
+    expect(sut).toBeDefined();
+  });
 
-    beforeEach(() => {
-        args = {
-            paths: ["."],
-            watch: false,
-            verbose: [false, false],
-            list: false,
-            recurse: false,
-            debug: false,
-            help: false,
-        };
-        container.snapshot();
-    });
+  it("runs in standalone mode when a path is given", async () => {
+    args.paths = ["."];
 
-    afterEach(() => {
-        container.restore();
-        jest.restoreAllMocks();
+    await sut.run(args);
+
+    expect(testService.run).toHaveBeenCalledOnce();
+  });
+
+  it("runs in flake mode when no path is given", async () => {
+    nixService.fetch.mockReturnValueOnce(registry);
+
+    await sut.run(args);
+
+    expect(testService.run).toHaveBeenCalledTimes(0);
+    expect(renderService.run).toHaveBeenCalledWith(args, registry.testSpec);
+  });
+
+  it("runs in standalone mode when the nixt registry is inaccessible", async () => {
+    nixService.fetch.mockImplementationOnce(() => {
+      throw new Error("error: Dummy error");
     })
 
-    it("is defined", () => {
-        expect(sut).toBeDefined();
-    });
+    await sut.run(args);
 
-    it("calls test() once when watch is false", () => {
-        const spy = jest.spyOn(sut, "test").mockImplementation(() => {});
+    expect(testService.run).toHaveBeenCalledOnce();
+    expect(renderService.run).toHaveBeenCalledWith(args, []);
+  });
 
-        sut.run(args);
+  it("runs in standalone mode when the nixt registry is malformed", async () => {
+    nixService.fetch.mockReturnValueOnce({ __schema: schemaVer, testSpec: "This isn't an array." });
 
-        expect(spy).toHaveBeenCalledTimes(1);
-    })
+    await sut.run(args);
 
-    // FIXME: Watcher persists
-    it.todo("calls test() for an initial run when watch is true");
-    // it("calls test() for an initial run when watch is true", () => {
-    //     const spy = jest.spyOn(sut, "test").mockImplementation(() => {});
-    //     args.watch = true;
+    expect(testService.run).toHaveBeenCalledOnce();
+    expect(renderService.run).toHaveBeenCalledWith(args, []);
+  });
 
-    //     sut.run(args);
+  it("runs in standalone mode when the nixt registry uses an unsupported schema", async () => {
+    registry.__schema = "v9001"
+    nixService.fetch.mockReturnValueOnce(registry);
 
-    //     expect(spy).toHaveBeenCalledTimes(1);
-    // })
+    await sut.run(args);
 
-    it.todo("returns non-zero exit code on fail");
-    it.todo("returns non-zero exit code on import err");
+    expect(testService.run).toHaveBeenCalledOnce();
+    expect(renderService.run).toHaveBeenCalledWith(args, []);
+  });
+
+  it("calls renderService once when watch is false", async () => {
+    args.watch = false;
+
+    await sut.run(args);
+
+    expect(renderService.run).toHaveBeenCalledOnce();
+  })
+
+  it("calls renderService for an initial run when watch is true", async () => {
+    args.watch = true;
+
+    await sut.run(args);
+
+    expect(renderService.run).toHaveBeenCalled();
+  })
 });

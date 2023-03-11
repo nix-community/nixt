@@ -1,7 +1,0 @@
-{ pkgs ? import <nixpkgs> { }, nixt }:
-
-nixt.mkSuites {
-  "Valid Tests" = {
-    "always passes" = true;
-  };
-}

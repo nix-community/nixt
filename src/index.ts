@@ -3,16 +3,20 @@
 import "reflect-metadata";
 
 import { Container } from "inversify";
-import { IApp, IArgParser } from "./interfaces.js";
 import { bindings } from "./bindings.js";
+import { IApp, IArgParser } from "./interfaces.js";
+import { CliArgs } from "./types.js";
 
-async function init() {
-    const container = new Container();
-    container.loadAsync(bindings);
-    const argParser = container.get(IArgParser);
-    const app = container.get(IApp);
+// Prepare DI
+const container = new Container();
+container.load(bindings);
 
-    app.run(argParser.run());
-}
+// Get args
+const argParser = container.get(IArgParser);
+let args: CliArgs = argParser.run();
 
-init();
+// Prepare to run
+const app = container.get(IApp);
+
+// Run
+app.run(args);

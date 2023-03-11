@@ -1,9 +1,8 @@
-import { injectable } from "inversify";
+import colors from "colors";
+import { fluentProvide } from "inversify-binding-decorators";
 import { IRenderService } from "../../interfaces.js";
 import { CliArgs, TestCase, TestFile, TestSuite } from "../../types.js";
-
-import colors from "colors";
-import * as warningFilters from './warningFilters/index.js'
+import * as warningFilters from './warningFilters/index.js';
 
 type Data = {
   args: CliArgs;
@@ -14,23 +13,80 @@ type Data = {
   importFailures: TestFile[];
 }
 
-@injectable()
+function reduceExpressions(testCase: TestCase) {
+  return testCase.expressions.reduce((accumulator, currentValue): boolean => {
+    let result: boolean;
+
+    accumulator
+      ? currentValue
+        ? result = true
+        : result = false
+      : result = false
+
+    return result
+  })
+}
+
+@fluentProvide(IRenderService).whenTargetTagged("ink", false).done()
 export class RenderService implements IRenderService {
+  public run(args: CliArgs, testFiles: TestFile[]): void {
+    const data = this.getData(args, testFiles);
+
+    console.log([
+      `\nFound ${colors.magenta(data.cases.length.toString())} cases`,
+      `in ${colors.magenta(data.suites.length.toString())} suites`,
+      `over ${colors.magenta(data.files.length.toString())} files.\n`,
+    ].join(" "))
+
+    for (const testFile of data.importSuccesses) {
+      this.renderFile(args, testFile);
+    }
+
+    if (data.importFailures.length > 0) {
+      process.exitCode = 1;
+
+      console.log('');
+      const warningGlyph = colors.yellow("⚠");
+      const failCountString = data.importFailures.length.toString();
+
+      console.log(`  ${warningGlyph} Couldn't import ${colors.magenta(failCountString)} files:`);
+
+      for (const testFile of data.importFailures) {
+        if (testFile.importError) {
+          let lines = testFile.importError.split("\n");
+          const filters = Object.values(warningFilters)
+          for (const filter of filters) {
+            const result = filter(lines);
+            if (result) {
+              lines = result;
+            }
+          }
+
+          console.log(`    - ${colors.magenta(testFile.path)} `);
+          console.log(`      ${lines.join("\n      ")} `);
+        }
+        console.log('');
+      }
+    }
+
+    return
+  }
+
   private getData(args: CliArgs, files: TestFile[]): Data {
     const suites = [];
     const cases = [];
 
-    for (const f of files) {
-      for (const s of Object.values(f.suites)) {
-        suites.push(s);
-        for (const c of Object.values(s.cases)) {
-          cases.push(c);
+    for (const file of files) {
+      for (const suite of Object.values(file.suites)) {
+        suites.push(suite);
+        for (const testCase of Object.values(suite.cases)) {
+          cases.push(testCase);
         }
       }
     }
 
-    const importSuccesses = files.filter(f => !f.importError);
-    const importFailures = files.filter(f => f.importError);
+    const importSuccesses = files.filter(file => !file.importError);
+    const importFailures = files.filter(file => file.importError);
 
     const data = {
       args: args,
@@ -44,41 +100,77 @@ export class RenderService implements IRenderService {
     return data
   }
 
-  private list(c: TestCase, lastC: boolean, lastS: boolean): void {
-    const glyph = lastC && lastS ? '┗' : '┃';
-    console.log(`${colors.gray(glyph)}   - ${c.name}`)
+  private renderFile(args: CliArgs, testFile: TestFile): void {
+    let relativePath = testFile.path;
+    for (const p in args.paths) {
+      relativePath = relativePath.replace(p, '');
+    }
+
+    let testSuites = Object.entries(Object.entries(testFile.suites));
+    if (!args.verbose[0]) {
+      testSuites = testSuites.filter(([, [, testSuite]]) => Object.values(testSuite.cases)
+        .some(testCase => !reduceExpressions(testCase)));
+    }
+    if (testSuites.length > 0) console.log(`${colors.gray("┏")} ${colors.magenta(relativePath)} `);
+    for (const [indexStr, [, testSuite]] of testSuites) {
+      const index = parseInt(indexStr);
+      const lastSuite = index === testSuites.length - 1;
+      this.renderSuite(args, testSuite, lastSuite);
+    }
+    return
+  }
+
+  private renderSuite(args: CliArgs, testSuite: TestSuite, lastSuite: boolean): void {
+    console.log(`${colors.gray("┃")}   ${colors.bold(testSuite.name)} `);
+    let testCases = Object.entries(Object.entries(testSuite.cases));
+    for (const [indexStr, [, testCase]] of testCases) {
+      const index = parseInt(indexStr);
+      const lastCase = index === testCases.length - 1;
+      args.list
+        ? this.renderList(testCase, lastCase, lastSuite)
+        : this.renderResult(args, testCase, lastCase, lastSuite)
+    }
+
+    !lastSuite
+      ? console.log(`${colors.gray("┃")} `)
+      : console.log("")
+    return
+  }
+
+  private renderList(testCase: TestCase, lastCase: boolean, lastSuite: boolean): void {
+    const glyph = lastCase && lastSuite ? '┗' : '┃';
+    console.log(`${colors.gray(glyph)}   - ${testCase.name}`)
 
     return
   }
 
-  private result(args: CliArgs, c: TestCase, lastC: boolean, lastS: boolean): void {
+  private renderResult(args: CliArgs, testCase: TestCase, lastCase: boolean, lastSuite: boolean): void {
     let glyph: string;
-    if (c.error) {
+    if (testCase.error || !reduceExpressions(testCase)) {
       process.exitCode = 1
     }
 
-    glyph = lastS && lastC && !c.error ? '┗' : '┃';
-    const mark = c.result ? colors.green('✓') : colors.red('✗');
-    if (!c.result || args.verbose[0]) {
-      console.log(`${colors.gray(glyph)}     ${mark} ${c.name}`);
+    glyph = lastSuite && lastCase && !testCase.error ? '┗' : '┃';
+    const mark = reduceExpressions(testCase) ? colors.green('✓') : colors.red('✗');
+    if (!reduceExpressions(testCase) || args.verbose[0]) {
+      console.log(`${colors.gray(glyph)}     ${mark} ${testCase.name} `);
     }
 
-    if (c.error && args.verbose[0]) {
-      const ls: string[] = c.error
+    if (testCase.error && args.verbose[0]) {
+      const lines: string[] = testCase.error
         .split('\n')
         .map((line) => line.trim())
         .filter((line) => line.length > 0);
 
-      if (ls.length > 1) {
-        const first = ls[0];
-        if (first.startsWith('Command failed: nix eval')) {
-          ls.shift();
+      if (lines.length > 1) {
+        if (lines[0]?.startsWith('Command failed: nix eval')) {
+          lines.shift();
         }
 
-        for (const [i, l] of Object.entries(ls)) {
-          const lastL = parseInt(i) === ls.length - 1;
-          glyph = lastL && lastC && lastS ? '┗' : '┃';
-          console.log(`${colors.yellow(glyph)}       ${colors.yellow(colors.italic(l))}`);
+        for (const [i, line] of Object.entries(lines)) {
+          const lastLine = parseInt(i) === lines.length - 1;
+          glyph = lastLine && lastCase && lastSuite ? '┗' : '┃';
+          console.log(`${colors.yellow(glyph)}       ${colors.yellow(colors.italic(line))} `);
         }
       }
     }
@@ -86,93 +178,4 @@ export class RenderService implements IRenderService {
     return
   }
 
-  public run(args: CliArgs, testFiles: TestFile[]): void {
-    const data = this.getData(args, testFiles);
-
-    const renderFile = (f: TestFile): void => {
-      let relativePath = f.path;
-      for (const p in args.paths) {
-        relativePath = relativePath.replace(p, '');
-      }
-
-      let ss = Object.entries(Object.entries(f.suites));
-      if (!args.verbose[0]) {
-        ss = ss.filter(([, [, s]]) => Object.values(s.cases).some(c => !c.result));
-      }
-      if (ss.length > 0) console.log(`${colors.gray("┏")} ${colors.magenta(relativePath)}`);
-      for (const [indexStr, [, s]] of ss) {
-        const index = parseInt(indexStr);
-        const lastS = index === ss.length - 1;
-        renderSuite(s, lastS);
-      }
-      return
-    }
-
-    const renderSuite = (s: TestSuite, lastS: boolean): void => {
-      console.log(`${colors.gray("┃")}   ${colors.bold(s.name)}`);
-      let cs = Object.entries(Object.entries(s.cases));
-      for (const [indexStr, [, c]] of cs) {
-        const index = parseInt(indexStr);
-        const lastC = index === cs.length - 1;
-        renderCase(c, lastC, lastS);
-      }
-      if (!lastS) {
-        console.log(`${colors.gray("┃")}`);
-      } else {
-        console.log("");
-      }
-      return
-    }
-
-    const renderCase = (c: TestCase, lastC: boolean, lastS: boolean): void => {
-      if (args.list) {
-        this.list(c, lastC, lastS);
-      } else {
-        this.result(args, c, lastC, lastS);
-      }
-    }
-
-    const go = () => {
-      console.log([
-        `\nFound ${colors.magenta(data.cases.length.toString())} cases`,
-        `in ${colors.magenta(data.suites.length.toString())} suites`,
-        `over ${colors.magenta(data.files.length.toString())} files.\n`,
-      ].join(" "))
-
-
-      for (const f of data.importSuccesses) {
-        renderFile(f);
-      }
-
-      if (data.importFailures.length > 0) {
-        process.exitCode = 1;
-
-        console.log('');
-        const warningGlyph = colors.yellow("⚠");
-        const failCountString = data.importFailures.length.toString();
-
-        console.log(`  ${warningGlyph} Couldn't import ${colors.magenta(failCountString)} files:`);
-
-        for (const f of data.importFailures) {
-          if (f.importError) {
-            let lines = f.importError.split("\n");
-            const filters = Object.values(warningFilters)
-            for (const filter of filters) {
-              const result = filter(lines);
-              if (result) {
-                lines = result;
-              }
-            }
-
-            console.log(`    - ${colors.magenta(f.path)} `);
-            console.log(`      ${lines.join("\n      ")} `);
-          }
-          console.log('');
-        }
-      }
-    }
-
-    go();
-    return
-  }
 }

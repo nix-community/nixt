@@ -1,37 +1,39 @@
-import { injectable } from "inversify";
+import { provide } from "inversify-binding-decorators";
 import { execSync } from "node:child_process";
-import { existsSync } from "node:fs";
-import { resolve } from "node:path";
 import { INixService } from "../../interfaces.js";
-import { NixOptions, Path } from "../../types.js";
 
-const generateCallArgs = (a: {}) => {
-    return Object
-        .entries(a)
-        .map(([key, value]) => `${key} = "${value}";`);
+const runCommand = (command: string) => {
+  const result = execSync(command, {
+    stdio: ["pipe", "pipe", "pipe"]
+  }).toString();
+
+  if (result.startsWith("error:") === true) {
+    throw new Error(result)
+  }
+
+  const parsed = JSON.parse(result);
+
+  return parsed;
 }
 
-@injectable()
+@provide(INixService)
 export class NixService implements INixService {
-    public eval(file: Path, options: NixOptions): any {
-        const nixPath = resolve(`nix/${file}`);
+  public fetch(target: string, trace: boolean): any {
+    const traceString = trace ? `--show-trace` : '';
+    const command = `nix eval --json ${traceString} ${target}`;
 
-        if (!existsSync(nixPath)) {
-            throw new Error(`Path "${nixPath}" is invalid`);
-        };
+    const parsed = runCommand(command);
 
-        const args = options.args ? generateCallArgs(options.args) : [];
-        const argsString = args.length > 0 ? `${args.join(' ')}` : '';
-        const traceString = options.trace ? `--show-trace` : '';
-        const expression = `import ${nixPath} { ${argsString} }`;
-        const command = `nix eval --json --impure ${traceString} --expr '${expression}'`;
+    return parsed;
+  }
 
-        const result = execSync(command, {
-            stdio: ["pipe", "pipe", "pipe"]
-        });
+  public inject(target: string, trace: boolean): any {
+    const traceString = trace ? `--show-trace` : '';
+    const command = `nix eval --json --impure ${traceString} --expr \
+'let inherit (import ./default.nix) lib; in lib.inject ${target}'`;
 
-        const parsed = JSON.parse(result.toString());
+    const parsed = runCommand(command);
 
-        return parsed;
-    }
+    return parsed;
+  }
 }

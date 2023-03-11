@@ -1,10 +1,9 @@
-import { injectable } from "inversify";
+import { provide } from "inversify-binding-decorators";
+import meow from "meow";
 import { IArgParser } from "../../interfaces.js";
 import { CliArgs } from "../../types.js";
 
-import meow from "meow";
-
-@injectable()
+@provide(IArgParser)
 export class ArgParser implements IArgParser {
   public run(): CliArgs {
     const meowResult = meow(`
@@ -64,14 +63,9 @@ Options
       }
     } else {
       parsedArgs = {
-        paths: ["."],
+        paths: [],
         ...meowResult.flags
       }
-    }
-
-    if (parsedArgs.debug) {
-      console.log('--- Args ---');
-      console.log(parsedArgs);
     }
 
     return parsedArgs;

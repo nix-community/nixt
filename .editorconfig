@@ -1,22 +1,28 @@
-root = true
+root=true
 
 [*]
-max_line_length = 120
-trim_trailing_whitespace = true
-end_of_line = lf
-insert_final_newline = true
-indent_style = space
+charset=utf-8
+end_of_line=lf
+indent_size=2
+indent_style=space
+insert_final_newline=true
+max_line_length=120
+trim_trailing_whitespace=true
 
-[*.nix]
-indent_size = 2
+[*.md]
+max_line_length=off
+trim_trailing_whitespace=false
 
-[*.{tsx?,jsx?,json}]
-indent_size = 4
+[*.{diff,patch}]
+end_of_line=unset
+indent_size=unset
+insert_final_newline=unset
+trim_trailing_whitespace=unset
 
-[{*.lock,package-lock.json}]
-max_line_length = unset
-trim_trailing_whitespace = unset
-end_of_line = unset
-insert_final_newline = unset
-indent_style = unset
-indent_size = unset
+[{LICENSES/**,LICENSE,*.lock,package-lock.json}]
+charset=unset
+end_of_line=unset
+indent_size=unset
+indent_style=unset
+insert_final_newline=unset
+trim_trailing_whitespace=unset

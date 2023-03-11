@@ -1,6 +1,6 @@
 #+title: Nixt
 
-Nixt is a unit-testing tool for Nixlang.
+Nixt is a unit-testing tool for Nix.
 
 * Installation
 
@@ -19,22 +19,22 @@ $ nix profile install github:nix-community/nixt
 Add Nixt as a flake to your configuration:
 
 #+begin_src nix
-  {
-    inputs.nixt = {
-      url = "path:/home/ldlework/src/nixt";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-  }
+{
+  inputs.nixt = {
+    url = "path:/home/ldlework/src/nixt";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+}
 #+end_src
 
 Then add the package to your packages:
 
 #+begin_src nix
-  {
-    environment.systemPackages = [
-      inputs.nixt.defaultPackage.x86_64-linux
-    ];
-  }
+{
+  environment.systemPackages = [
+    inputs.nixt.defaultPackage.x86_64-linux
+  ];
+}
 #+end_src
 
 * Help
@@ -55,7 +55,7 @@ Options
 
 * Running Tests
 
-The =nixt= CLI discovers and runs tests located at =-p/--path=:
+If it does not find a registry, the =nixt= CLI discovers and runs tests located at =-p/--path=:
 
 #+begin_src text
 $ nixt ./nix/
@@ -66,11 +66,11 @@ Found 14 cases in 8 suites over 3 files.
 
 ┏ /home/ldlework/src/nixt/cli/nix/get-testset.test.nix
 ┃   mkSuites
-┗     ✗ always fails
+┃     ✗ always fails
 
 ┏ /home/ldlework/src/nixt/cli/nix/utils.test.nix
 ┃   broken test
-┗     ✗ undefined variable
+┃     ✗ undefined variable
 
   ⚠ Couldn't import 1 files:
     - /home/ldlework/src/nixt/cli/nix/invalid.test.nix
@@ -135,99 +135,140 @@ To list discovered tests without actually evaluating their cases use the
 =--l/-list= flag:
 
 #+begin_src text
-  $ nixt ./nix/ -l
+$ nixt ./nix/ -l
 
-  Found 14 cases in 8 suites over 3 files.
+Found 14 cases in 8 suites over 3 files.
 
-    ⚠ Couldn't import 1 files:
-      - /home/ldlework/src/nixt/cli/nix/invalid.test.nix
-        Import error: called with unexpected argument 'nixt'
-        Did you forgot to add the 'nixt' argument to your test expression?
+  ⚠ Couldn't import 1 files:
+    - /home/ldlework/src/nixt/cli/nix/invalid.test.nix
+      Import error: called with unexpected argument 'nixt'
+      Did you forgot to add the 'nixt' argument to your test expression?
 #+end_src
 
 Or with the =-v/--verbose= flag:
 
 #+begin_src text
-  $ nixt ./nix/ -l -v
+$ nixt ./nix/ -l -v
 
-  Found 14 cases in 8 suites over 3 files.
+Found 14 cases in 8 suites over 3 files.
 
-  ┏ /home/ldlework/src/nixt/cli/nix/get-testset.test.nix
-  ┃   mkSuite
-  ┃     - creates correct structure
-  ┃   mkSuites
-  ┃     - always fails
-  ┗     - creates correct structure
+┏ /home/ldlework/src/nixt/cli/nix/get-testset.test.nix
+┃   mkSuite
+┃     - creates correct structure
+┃   mkSuites
+┃     - always fails
+┗     - creates correct structure
 
-  ┏ /home/ldlework/src/nixt/cli/nix/utils.test.nix
-  ┃   broken test
-  ┃     - undefined variable
-  ┃   dirFiles
-  ┃     - empty list for non-existent path
-  ┃     - non-empty list for existing path
-  ┃   findNixFiles
-  ┃     - empty list for non-existent path
-  ┃     - non-empty list for existing path
-  ┃   getDir
-  ┃     - empty list for non-existent path
-  ┃     - non-empty list for existing path
-  ┃   isNix
-  ┃     - false for non-nix files
-  ┃     - true for nix files
-  ┃   isTestSuite
-  ┃     - false for non-test suites
-  ┗     - true for test suites
+┏ /home/ldlework/src/nixt/cli/nix/utils.test.nix
+┃   broken test
+┃     - undefined variable
+┃   dirFiles
+┃     - empty list for non-existent path
+┃     - non-empty list for existing path
+┃   findNixFiles
+┃     - empty list for non-existent path
+┃     - non-empty list for existing path
+┃   getDir
+┃     - empty list for non-existent path
+┃     - non-empty list for existing path
+┃   isNix
+┃     - false for non-nix files
+┃     - true for nix files
+┃   isTestSuite
+┃     - false for non-test suites
+┗     - true for test suites
 
-    ⚠ Couldn't import 1 files:
-      - /home/ldlework/src/nixt/cli/nix/invalid.test.nix
-        Import error: called with unexpected argument 'nixt'
-        Did you forgot to add the 'nixt' argument to your test expression?
+  ⚠ Couldn't import 1 files:
+    - /home/ldlework/src/nixt/cli/nix/invalid.test.nix
+      Import error: called with unexpected argument 'nixt'
+      Did you forgot to add the 'nixt' argument to your test expression?
 #+end_src
 
 * Writing Tests
 
-Nixt tests are written in =.test.nix=, =.spec.nix=, or =.nixt= files that:
+Nixt tests are written in =blocks=. Users may use flakes or standalone testing.
 
-- Contains a function taking attrset args =pkgs= and =nixt=
-- Evaluates to a call of =nixt.mkSuite= or =nixt.mkSuites=
+When not using flakes, a block is put in its own file which:
 
-Each suite is composed of one or more cases.
+- Contains a function taking attrset args =nixt= and =pkgs=
+- Evaluates to a call of =nixt.block=
 
-Each case should be an expression that evaluates to a boolean of whether the
-test passes.
+Each block is composed of one or more suites;  Each suite is composed of one or more cases.
+Each case should be an expression or list of expressions that evaluate to booleans.
 
-*mkSuite*
-
-Args:
-- name: string name of the suite
-- cases: attrset of cases
-
-Defines a single suite of cases for the file.
-
+For those curious:
 #+begin_src nix
-  { pkgs ? import <nixpkgs> {}, nixt }:
-
-  nixt.mkSuite "always passes" {
-    "always true" = true; # the expression here should test something
-  }
+Block = struct "Block" {
+  path = path;
+  suites = list TestSuite;
+};
 #+end_src
 
-*mkSuites*
+#+begin_src nix
+TestSuite = struct "TestSuite" {
+  name = string;
+  cases = list TestCase;
+};
+#+end_src
+
+#+begin_src nix
+TestCase = struct "TestCase" {
+  name = string;
+  expressions = list bool;
+};
+#+end_src
+
+* Library Functions
+** grow
 
 Args:
+- blocks: A list of =blocks=
+- settings: Optional attrset of settings
+
+Builds the nixt registry for cli consumption. Only relevant to flakes.
+
+#+begin_src nix
+{
+  inputs = {
+    nixt.url = "github:nix-community/nixt";
+  };
+
+  outputs = {
+    nixt,
+    ...
+  } @ inputs:
+  {
+    __nixt = nixt.lib.grow {
+      blocks = [
+        nixt.lib.block ./flake.nix {
+          "nixt"."passes this test" = true;
+        }
+      ];
+    };
+  };
+}
+#+end_src
+
+** block
+
+Args:
+- path: path to the current file
 - suites: attrset of suites
 
-Defines multiple suites of cases for the file.
+Creates a nixt block.
 
 #+begin_src nix
-    { pkgs ? import <nixpkgs> {}, nixt }:
+{nixt, pkgs ? import <nixpkgs> {}}:
 
-    nixt.mkSuites {
-      "foo suite" = {
-        "foo is foo" = "foo" == "foo";
-      };
-      "bar suite" = {
-        "bar is bar" = "bar" == "baz";
-      };
-    }
+nixt.block ./block.spec.nix {
+  "nixt"."passes this test" = true;
+  "nixt"."fails this test" = false;
+}
 #+end_src
+
+** inject
+
+Args:
+- path: path to a test file
+
+Provides arguments to compliant files. For standalone support and cli use.
