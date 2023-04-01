@@ -6,7 +6,6 @@ end_of_line=lf
 indent_size=2
 indent_style=space
 insert_final_newline=true
-max_line_length=120
 trim_trailing_whitespace=true
 
 [*.md]
@@ -19,7 +18,15 @@ indent_size=unset
 insert_final_newline=unset
 trim_trailing_whitespace=unset
 
-[{LICENSES/**,LICENSE,*.lock,package-lock.json}]
+[{*.lock,package-lock.json}]
+charset=unset
+end_of_line=unset
+indent_size=unset
+indent_style=unset
+insert_final_newline=unset
+trim_trailing_whitespace=unset
+
+[{LICENSES/**,LICENSE}]
 charset=unset
 end_of_line=unset
 indent_size=unset
