@@ -186,12 +186,12 @@ Found 14 cases in 8 suites over 3 files.
 
 * Writing Tests
 
-Nixt tests are written in =blocks=. Users may use flakes or standalone testing.
+Nixt tests are written in blocks. Users may use flakes or standalone testing.
 
-When not using flakes, a block is put in its own file which:
+With standalone testing, a block is put in its own file which:
 
 - Contains a function taking attrset args =nixt= and =pkgs=
-- Evaluates to a call of =nixt.block=
+- Evaluates to a =Block=
 
 Each block is composed of one or more suites;  Each suite is composed of one or more cases.
 Each case should be an expression or list of expressions that evaluate to booleans.
@@ -222,8 +222,9 @@ TestCase = struct "TestCase" {
 ** grow
 
 Args:
-- blocks: A list of =blocks=
-- settings: Optional attrset of settings
+- =attrset= containing
+  + blocks: =list= of =Block=
+  + settings: Optional =attrset= of settings
 
 Builds the nixt registry for cli consumption. Only relevant to flakes.
 
@@ -240,8 +241,9 @@ Builds the nixt registry for cli consumption. Only relevant to flakes.
   {
     __nixt = nixt.lib.grow {
       blocks = [
-        nixt.lib.block ./flake.nix {
+        nixt.lib.block' ./flake.nix {
           "nixt"."passes this test" = true;
+          "nixt"."fails this test" = false;
         }
       ];
     };
@@ -252,10 +254,29 @@ Builds the nixt registry for cli consumption. Only relevant to flakes.
 ** block
 
 Args:
-- path: path to the current file
-- suites: attrset of suites
+- path: =path= to the current file
+- suites: =list= of =TestSuites=
 
-Creates a nixt block.
+Creates a =Block= from a =path= and =list= of =TestSuite=.
+
+#+begin_src nix
+{nixt, pkgs ? import <nixpkgs> {}}:
+
+nixt.block ./block.spec.nix [
+  (describe' "nixt" [
+    "passes this test" = true;
+    "fails this test" = false;
+  ]);
+]
+#+end_src
+
+** block'
+
+Args:
+- path: =path= to the current file
+- suites: =attrset= of suites
+
+Creates a =Block= from a =path= and =attrset=.
 
 #+begin_src nix
 {nixt, pkgs ? import <nixpkgs> {}}:
@@ -266,9 +287,66 @@ nixt.block ./block.spec.nix {
 }
 #+end_src
 
+** describe
+
+Args:
+- name: =string=
+- cases: =list= of =TestCase=
+
+Creates a =TestSuite= from a =string= and =list= of =TestCase=
+
+#+begin_src nix
+{nixt, pkgs ? import <nixpkgs> {}}:
+
+nixt.block ./block.spec.nix [
+  (describe "nixt" [
+    (it "passes this test" true)
+    (it "fails this test" false)
+  ])
+]
+#+end_src
+
+** describe'
+
+Args:
+- name: =string=
+- cases: =attrset= of cases
+
+Creates a =TestSuite= from a =string= and =attrset=
+
+#+begin_src nix
+{nixt, pkgs ? import <nixpkgs> {}}:
+
+nixt.block ./block.spec.nix [
+  (describe' "nixt" [
+    "passes this test" = true;
+    "fails this test" = false;
+  ]);
+]
+#+end_src
+
+** it
+
+Args:
+- name: =string=
+- expressions: =bool= or =list= of =bool=
+
+Creates a =TestCase= from a =string= and =bool= or =list= of =bool=
+
+#+begin_src nix
+{nixt, pkgs ? import <nixpkgs> {}}:
+
+nixt.block ./block.spec.nix [
+  (describe "nixt" [
+    (it "passes this test" true)
+    (it "fails this test" false)
+  ])
+]
+#+end_src
+
 ** inject
 
 Args:
-- path: path to a test file
+- path: =path= to a test file
 
 Provides arguments to compliant files. For standalone support and cli use.
