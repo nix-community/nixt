@@ -40,17 +40,19 @@ describe("TestService", () => {
     };
     dummyFile = {
       path: "./dummy.nix",
-      suites: [{
-        name: "Dummy",
-        cases: [{
-          name: "is a dummy suite",
-          expressions: [true]
-        }]
-      }]
+      suites: [
+        {
+          name: "Dummy",
+          cases: [
+            {
+              name: "is a dummy suite",
+              expressions: [true],
+            },
+          ],
+        },
+      ],
     };
-    dummySpec = [
-      dummyFile
-    ]
+    dummySpec = [dummyFile];
   });
 
   afterEach(() => {
@@ -64,8 +66,8 @@ describe("TestService", () => {
 
   it("returns spec for valid files", async () => {
     nixService.inject.mockImplementationOnce(async (target: string) => {
-      if (target.includes(".spec.nix") === true) return dummyFile
-      return {}
+      if (target.includes(".spec.nix") === true) return dummyFile;
+      return {};
     });
     args.paths = ["./examples/valid.spec.nix"];
 
@@ -76,24 +78,21 @@ describe("TestService", () => {
 
   it("returns spec for multiple paths", async () => {
     nixService.inject.mockImplementation(async (target: string) => {
-      if (target.includes(".spec.nix") === true) return dummyFile
-      return {}
+      if (target.includes(".spec.nix") === true) return dummyFile;
+      return {};
     });
     const path = "./examples/valid.spec.nix";
     args.paths = [path, path];
 
     const result = await sut.run(args);
 
-    dummySpec = [
-      dummyFile,
-      dummyFile
-    ]
+    dummySpec = [dummyFile, dummyFile];
     expect(result).toStrictEqual(dummySpec);
-  })
+  });
 
   it("handles NixService errors", async () => {
     nixService.inject.mockImplementationOnce(async () => {
-      throw new Error('error: something went wrong')
+      throw new Error("error: something went wrong");
     });
     const path = "./examples/valid.spec.nix";
     args.paths = [path];
@@ -104,9 +103,9 @@ describe("TestService", () => {
       {
         path: resolve(path),
         suites: [],
-        importError: 'error: something went wrong'
-      }
-    ]
+        importError: "error: something went wrong",
+      },
+    ];
     expect(result).toEqual(dummySpec);
   });
 });

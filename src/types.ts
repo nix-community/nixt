@@ -24,16 +24,18 @@ export const testFile = z.object({
 export type TestFile = z.infer<typeof testFile>;
 
 export const schemaVer = "v0.0";
-export const schema = z.object({
-  __schema: z.string(),
-  settings: z.object({
-    list: z.boolean(),
-    watch: z.boolean(),
-    verbose: z.boolean(),
-    trace: z.boolean()
-  }),
-  testSpec: testFile.array(),
-}).required();
+export const schema = z
+  .object({
+    __schema: z.string(),
+    settings: z.object({
+      list: z.boolean(),
+      watch: z.boolean(),
+      verbose: z.boolean(),
+      trace: z.boolean(),
+    }),
+    testSpec: testFile.array(),
+  })
+  .required();
 
 export type Schema = z.infer<typeof schema>;
 
