@@ -5,7 +5,5 @@
   inherit (inputs.cells.lib) nixt;
 in
   nixt.grow {
-    blocks = [
-      (import ./nixt.spec.nix {inherit inputs cell;})
-    ];
+    blocks = [(import ./nixt.spec.nix {inherit inputs cell;})];
   }

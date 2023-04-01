@@ -34,7 +34,7 @@
     name = string;
     expressions = list bool;
   };
-in {
+in rec {
   # Build the nixt schema. Should be outputted to __nixt for CLI consumption.
   grow =
     defun [
@@ -62,38 +62,42 @@ in {
     );
 
   # Generates test blocks
-  block = let
-    # Prepares test cases for describe consumption
-    it =
-      defun [string (either bool (list bool)) TestCase]
-      (
-        name: expressions:
-          TestCase {
-            inherit name;
-            expressions =
-              if lib.isList expressions
-              then expressions
-              else lib.toList expressions;
-          }
-      );
+  block =
+    defun [path (list TestSuite) Block]
+    (
+      path: suites: Block {inherit path suites;}
+    );
 
-    # Prepares test suites for block consumption
-    describe =
-      defun [string (attrs (either bool (list bool))) TestSuite]
-      (
-        name: cases:
-          TestSuite {
-            inherit name;
-            cases = lib.mapAttrsToList (caseName: expressions: it caseName expressions) cases;
-          }
-      );
-  in
+  block' =
     defun [path (attrs (attrs (either bool (list bool)))) Block]
     (
-      path: suites:
-        Block {
-          inherit path;
-          suites = lib.mapAttrsToList (name: cases: describe name cases) suites;
+      path: suites: block path (lib.mapAttrsToList (name: cases: describe' name cases) suites)
+    );
+
+  # Prepares test suites for block consumption
+  describe =
+    defun [string (list TestCase) TestSuite]
+    (
+      name: cases: TestSuite {inherit name cases;}
+    );
+
+  describe' =
+    defun [string (attrs (either bool (list bool))) TestSuite]
+    (
+      name: cases: describe name (lib.mapAttrsToList (caseName: expressions: it caseName expressions) cases)
+    );
+
+  # Prepares test cases for describe consumption
+  it =
+    defun [string (either bool (list bool)) TestCase]
+    (
+      name: expressions:
+        TestCase {
+          inherit name;
+          expressions =
+            if lib.isList expressions
+            then expressions
+            else lib.toList expressions;
         }
     );
 
