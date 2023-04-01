@@ -48,6 +48,7 @@
 
         # lib
         (functions "nixt")
+        (functions "types")
       ];
     }
     {
