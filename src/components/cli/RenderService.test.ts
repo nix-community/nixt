@@ -9,16 +9,16 @@ describe("RenderService", () => {
   let sut: IRenderService;
 
   beforeAll(() => {
-    container = new Container;
+    container = new Container();
     container.load(bindings);
     sut = container.getTagged(IRenderService, "ink", false);
-  })
+  });
 
   beforeEach(() => {
     container.snapshot();
-  })
+  });
 
   it("is defined", () => {
     expect(sut).toBeDefined();
-  })
-})
+  });
+});

@@ -1,1 +1,1 @@
-export * from "./NixService.js"
+export * from "./NixService.js";

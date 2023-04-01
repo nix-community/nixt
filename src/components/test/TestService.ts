@@ -9,9 +9,7 @@ import { CliArgs, TestFile } from "../../types.js";
 export class TestFinder implements TestService {
   private _nixService: INixService;
 
-  public constructor(
-    @inject(INixService) nixService: INixService
-  ) {
+  public constructor(@inject(INixService) nixService: INixService) {
     this._nixService = nixService;
   }
 
@@ -22,10 +20,10 @@ export class TestFinder implements TestService {
       const absolutePath = resolve(path);
 
       const files = await this.getFiles(args, absolutePath).then((files) =>
-        files.filter((path) =>
-          path.endsWith(".test.nix")
-          || path.endsWith(".spec.nix")
-        ));
+        files.filter(
+          (path) => path.endsWith(".test.nix") || path.endsWith(".spec.nix")
+        )
+      );
 
       for (const file of files) {
         let testedFile: TestFile;
@@ -33,19 +31,19 @@ export class TestFinder implements TestService {
         testedFile = {
           path: absolutePath,
           suites: [],
-        }
+        };
 
         try {
-          testedFile = await this._nixService.inject(file, args.verbose[1]!)
+          testedFile = await this._nixService.inject(file, args.verbose[1]!);
         } catch (error: any) {
           testedFile.importError = error.message;
         }
 
-        spec.push(testedFile)
+        spec.push(testedFile);
       }
     }
 
-    return spec
+    return spec;
   }
 
   private async getFiles(args: CliArgs, path: string): Promise<string[]> {
@@ -57,21 +55,26 @@ export class TestFinder implements TestService {
       if (stats.isFile()) files = [path];
 
       if (stats.isDirectory()) {
-        const read = await readdir(path).then((files) => files.map((file) => `${path}/${file}`));
+        const read = await readdir(path).then((files) =>
+          files.map((file) => `${path}/${file}`)
+        );
 
         files = read.filter((file) => stat(file).then((file) => file.isFile()));
-        const dirs = read.filter((file) => stat(file).then((file) => file.isDirectory()));
+        const dirs = read.filter((file) =>
+          stat(file).then((file) => file.isDirectory())
+        );
 
         if (args.recurse && dirs.length > 0) {
-          const newFiles = await Promise.all(dirs.map((dir) => this.getFiles(args, dir)));
+          const newFiles = await Promise.all(
+            dirs.map((dir) => this.getFiles(args, dir))
+          );
           files = files.concat(newFiles.flat());
         }
       }
     } catch (error: any) {
       if (error.code === "ENOENT") {
         console.log(`File does not exist: ${path}`);
-      }
-      else {
+      } else {
         console.log(`IO error: ${error.code}`);
       }
     }
