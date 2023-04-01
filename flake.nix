@@ -41,13 +41,13 @@
         (devshells "devshells")
         (nixago "configs")
         (functions "toolchain")
+        (data "tests")
 
         # app
         (installables "packages")
 
         # lib
         (functions "nixt")
-        (data "tests")
       ];
     }
     {
