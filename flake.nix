@@ -7,11 +7,20 @@
       flake = false;
     };
 
-    std.url = "github:divnix/std";
-
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
-    yants.url = "github:divnix/yants";
+    std = {
+      url = "github:divnix/std";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    std-data-collection = {
+      url = "github:divnix/std-data-collection";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        std.follows = "std";
+      };
+    };
 
     dream2nix = {
       url = "github:nix-community/dream2nix";
@@ -28,11 +37,13 @@
       inherit inputs;
       cellsFrom = ./nix;
       cellBlocks = with std.blockTypes; [
-        # app
-        (installables "packages" {ci.build = true;})
+        # repo
         (devshells "devshells")
-        (functions "dream2nix")
         (nixago "configs")
+        (functions "toolchain")
+
+        # app
+        (installables "packages")
 
         # lib
         (functions "nixt")
@@ -41,7 +52,7 @@
     }
     {
       packages = std.harvest self ["app" "packages"];
-      devShells = std.harvest self ["_automation" "devshells"];
+      devShells = std.harvest self ["repo" "devshells"];
       lib = std.pick self ["lib" "nixt"];
       __nixt = std.pick self ["lib" "tests"];
     };

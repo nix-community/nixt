@@ -2,9 +2,9 @@
   inputs,
   cell,
 }: let
-  inherit (inputs) std dream2nix self;
-in
-  dream2nix.lib.makeFlakeOutputs {
+  inherit (inputs) self std dream2nix;
+in {
+  dream2nix = dream2nix.lib.makeFlakeOutputs {
     systems = [inputs.nixpkgs.system];
     config.projectRoot = self;
     source = std.incl self [
@@ -14,9 +14,13 @@ in
       (self + /src)
       (self + /nix)
     ];
-    settings = [
-      {
+    projects = {
+      nixt = {
+        name = "nixt";
+        subsystem = "nodejs";
         subsystemInfo.nodejs = 18;
-      }
-    ];
-  }
+        translator = "package-lock";
+      };
+    };
+  };
+}

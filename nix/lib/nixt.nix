@@ -2,10 +2,10 @@
   inputs,
   cell,
 }: let
-  inherit (inputs) nixpkgs yants;
+  inherit (inputs) nixpkgs std;
   lib = nixpkgs.lib // builtins;
 
-  inherit (yants) string bool path attrs list struct defun either option;
+  inherit (std.inputs.yants) string bool path attrs list struct defun either option;
 
   Schema = struct "Schema" {
     __schema = string;
