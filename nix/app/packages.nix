@@ -3,11 +3,12 @@
   cell,
 }: let
   inherit (inputs) nixpkgs std self;
+  lock = builtins.fromJSON (builtins.readFile (self + "/package-lock.json"));
+  inherit (lock) name version;
 in rec {
-  default = nixt;
-  nixt = nixpkgs.buildNpmPackage {
-    pname = "nixt";
-    version = "0.4.0";
+  default = nixpkgs.buildNpmPackage {
+    pname = name;
+    inherit version;
 
     src = std.incl self [
       "package.json"
