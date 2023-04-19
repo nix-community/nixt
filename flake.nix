@@ -21,11 +21,6 @@
         std.follows = "std";
       };
     };
-
-    dream2nix = {
-      url = "github:nix-community/dream2nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs = {
@@ -40,7 +35,6 @@
         # repo
         (devshells "devshells")
         (nixago "configs")
-        (functions "toolchain")
         (data "tests")
 
         # app
