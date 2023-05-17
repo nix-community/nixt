@@ -7,11 +7,6 @@ export abstract class IApp {
 }
 
 @injectable()
-export abstract class IArgParser {
-  abstract run(): CliArgs;
-}
-
-@injectable()
 export abstract class TestService {
   abstract run(args: CliArgs): Promise<TestFile[]>;
 }

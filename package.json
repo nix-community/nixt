@@ -10,27 +10,28 @@
     "node": ">=16.0.0"
   },
   "bin": {
-    "nixt": "./dist/index.js"
+    "nixt": "dist/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && chmod +x dist/index.js",
     "test": "vitest"
   },
   "devDependencies": {
-    "@types/node": "^18.11.18",
+    "@types/node": "^18.16.12",
     "ink-testing-library": "^2.1.0",
-    "typescript": "^4.9.4",
-    "vitest": "^0.27.0"
+    "typescript": "^5.0.4",
+    "vitest": "^0.31.0"
   },
   "dependencies": {
     "chokidar": "^3.5.3",
     "colors": "^1.4.0",
-    "ink": "^4.1.0",
+    "commander": "^11.0.0",
+    "@commander-js/extra-typings": "^11.0.0",
+    "ink": "^4.2.0",
     "inversify": "^6.0.1",
     "inversify-binding-decorators": "^4.0.0",
-    "meow": "^11.0.0",
     "react": "^18.2.0",
     "reflect-metadata": "^0.1.13",
-    "zod": "^3.20.2"
+    "zod": "^3.21.4"
   }
 }

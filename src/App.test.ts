@@ -8,15 +8,11 @@ import {
   IRenderService,
   TestService,
 } from "./interfaces.js";
-import { CliArgs, Schema, schemaVer, TestFile } from "./types.js";
+import { CliArgs, Schema, schemaVer } from "./types.js";
 
 const nixService = {
-  fetch: vi.fn(() => {
-    return {};
-  }),
-  inject: vi.fn(() => {
-    return {};
-  }),
+  fetch: vi.fn(),
+  inject: vi.fn(),
 };
 
 const renderService = {
@@ -24,9 +20,7 @@ const renderService = {
 };
 
 const testService = {
-  run: vi.fn(async (): Promise<TestFile[]> => {
-    return [];
-  }),
+  run: vi.fn(),
 };
 
 describe("App", () => {
@@ -50,11 +44,11 @@ describe("App", () => {
     args = {
       paths: [],
       watch: false,
-      verbose: [false, false],
+      verbose: false,
+      showTrace: false,
       list: false,
       recurse: false,
       debug: false,
-      help: false,
     };
 
     registry = {
@@ -95,14 +89,6 @@ describe("App", () => {
     expect(sut).toBeDefined();
   });
 
-  it("runs in standalone mode when a path is given", async () => {
-    args.paths = ["."];
-
-    await sut.run(args);
-
-    expect(testService.run).toHaveBeenCalledOnce();
-  });
-
   it("runs in flake mode when no path is given", async () => {
     nixService.fetch.mockReturnValueOnce(registry);
 
@@ -112,40 +98,21 @@ describe("App", () => {
     expect(renderService.run).toHaveBeenCalledWith(args, registry.testSpec);
   });
 
-  it("runs in standalone mode when the nixt registry is inaccessible", async () => {
-    nixService.fetch.mockImplementationOnce(() => {
-      throw new Error("error: Dummy error");
-    });
+  it("runs in standalone mode when a path is given", async () => {
+    testService.run.mockReturnValueOnce([]);
+
+    args.paths = ["."];
 
     await sut.run(args);
 
     expect(testService.run).toHaveBeenCalledOnce();
-    expect(renderService.run).toHaveBeenCalledWith(args, []);
   });
 
-  it("runs in standalone mode when the nixt registry is malformed", async () => {
-    nixService.fetch.mockReturnValueOnce({
-      __schema: schemaVer,
-      testSpec: "This isn't an array.",
-    });
-
-    await sut.run(args);
-
-    expect(testService.run).toHaveBeenCalledOnce();
-    expect(renderService.run).toHaveBeenCalledWith(args, []);
-  });
-
-  it("runs in standalone mode when the nixt registry uses an unsupported schema", async () => {
-    registry.__schema = "v9001";
-    nixService.fetch.mockReturnValueOnce(registry);
-
-    await sut.run(args);
-
-    expect(testService.run).toHaveBeenCalledOnce();
-    expect(renderService.run).toHaveBeenCalledWith(args, []);
-  });
+  it.todo("throws when no path is given and the registry in invalid");
 
   it("calls renderService once when watch is false", async () => {
+    nixService.fetch.mockReturnValueOnce(registry);
+
     args.watch = false;
 
     await sut.run(args);
@@ -154,6 +121,8 @@ describe("App", () => {
   });
 
   it("calls renderService for an initial run when watch is true", async () => {
+    nixService.fetch.mockReturnValueOnce(registry);
+
     args.watch = true;
 
     await sut.run(args);

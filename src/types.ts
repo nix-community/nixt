@@ -42,9 +42,9 @@ export type Schema = z.infer<typeof schema>;
 export type CliArgs = {
   paths: string[];
   watch: boolean;
-  verbose: boolean[];
+  verbose: boolean;
+  showTrace: boolean;
   list: boolean;
   recurse: boolean;
   debug: boolean;
-  help: boolean;
 };

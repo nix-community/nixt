@@ -4,19 +4,41 @@ import "reflect-metadata";
 
 import { Container } from "inversify";
 import { bindings } from "./bindings.js";
-import { IApp, IArgParser } from "./interfaces.js";
+import { IApp } from "./interfaces.js";
+import { Command } from "@commander-js/extra-typings";
 import { CliArgs } from "./types.js";
 
-// Prepare DI
 const container = new Container();
 container.load(bindings);
 
-// Get args
-const argParser = container.get(IArgParser);
-let args: CliArgs = argParser.run();
+const nixt = new Command("nixt");
 
-// Prepare to run
-const app = container.get(IApp);
+nixt.command("run", { isDefault: true, hidden: true })
+  .argument("[paths...]", "paths to search for tests")
+  .option("-w, --watch", "watch for changes", false)
+  .option("-v, --verbose", "show passing tests", false)
+  .option("--show-trace", "pass '--show-trace` to nix commands", false)
+  .option("-l, --list", "list tests", false)
+  .option("--no-recurse", "don't recurse directories")
+  .option("-d, --debug", "show debug info", false)
+  .action((paths, options) => {
+    const app = container.getTagged(IApp, "ink", false);
+    const args: CliArgs = { paths, ...options };
+    app.run(args);
+  });
 
-// Run
-app.run(args);
+nixt.command("ink", { hidden: true })
+  .argument("[paths...]", "paths to search for tests")
+  .option("-w, --watch", "watch for changes", false)
+  .option("-v, --verbose", "show passing tests", false)
+  .option("--show-trace", "pass '--show-trace` to nix commands", false)
+  .option("-l, --list", "list tests", false)
+  .option("--no-recurse", "don't recurse directories")
+  .option("-d, --debug", "show debug info", false)
+  .action((paths, options) => {
+    const app = container.getTagged(IApp, "ink", false);
+    const args: CliArgs = { paths, ...options };
+    app.run(args);
+  });
+
+nixt.parse();

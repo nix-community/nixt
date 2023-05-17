@@ -32,11 +32,11 @@ describe("TestService", () => {
     args = {
       paths: ["."],
       watch: false,
-      verbose: [false, false],
+      verbose: false,
+      showTrace: false,
       list: false,
       recurse: false,
       debug: false,
-      help: false,
     };
     dummyFile = {
       path: "./dummy.nix",

@@ -113,7 +113,7 @@ export class RenderService implements IRenderService {
     }
 
     let testSuites = Object.entries(Object.entries(testFile.suites));
-    if (!args.verbose[0]) {
+    if (!args.verbose) {
       testSuites = testSuites.filter(([, [, testSuite]]) =>
         Object.values(testSuite.cases).some(
           (testCase) => !reduceExpressions(testCase)
@@ -175,11 +175,11 @@ export class RenderService implements IRenderService {
     const mark = reduceExpressions(testCase)
       ? colors.green("✓")
       : colors.red("✗");
-    if (!reduceExpressions(testCase) || args.verbose[0]) {
+    if (!reduceExpressions(testCase) || args.verbose) {
       console.log(`${colors.gray(glyph)}     ${mark} ${testCase.name} `);
     }
 
-    if (testCase.error && args.verbose[0]) {
+    if (testCase.error && args.verbose) {
       const lines: string[] = testCase.error
         .split("\n")
         .map((line) => line.trim())

@@ -53,29 +53,13 @@ export class App implements IApp {
   private async fetchSchema(args: CliArgs): Promise<Schema> {
     let result: Schema;
 
-    try {
-      const registry = schema.safeParse(
-        this._nixService.fetch(".#__nixt", false)
-      );
-
-      if (
-        args.paths.length > 0 ||
-        registry.success === false ||
-        registry.data.__schema !== schemaVer
-      ) {
-        if (args.paths.length > 0)
-          console.log("Path provided: standalone mode");
-        if (registry.success === false)
-          console.log("Registry non-conformant: standalone mode");
-        else if (registry.data.__schema !== schemaVer)
-          console.log("Schema mismatch: standalone mode");
-        result = await this.buildSchema(args);
-      } else {
-        result = registry.data;
-      }
-    } catch (error: any) {
-      console.log("Failed to access registry: standalone mode");
+    if (args.paths.length > 0) {
+      console.log("Path provided: standalone mode");
       result = await this.buildSchema(args);
+    } else {
+      result = schema.parse(
+        this._nixService.fetch(".#__nixt", args.debug || args.showTrace)
+      );
     }
 
     return result;

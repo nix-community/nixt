@@ -34,7 +34,7 @@ export class TestFinder implements TestService {
         };
 
         try {
-          testedFile = await this._nixService.inject(file, args.verbose[1]!);
+          testedFile = await this._nixService.inject(file, args.showTrace);
         } catch (error: any) {
           testedFile.importError = error.message;
         }
