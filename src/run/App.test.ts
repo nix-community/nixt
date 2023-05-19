@@ -1,14 +1,15 @@
 import "reflect-metadata";
 
 import { Container } from "inversify";
-import { bindings } from "./bindings.js";
+import { bindings } from "../bindings.js";
 import {
   IApp,
   INixService,
   IRenderService,
   TestService,
-} from "./interfaces.js";
-import { CliArgs, Schema, schemaVer } from "./types.js";
+} from "../interfaces.js";
+import { CliArgs, Schema } from "../types.js";
+import { defaultArgs, defaultRegistry } from "../testDefaults.js";
 
 const nixService = {
   fetch: vi.fn(),
@@ -41,42 +42,8 @@ describe("App", () => {
   });
 
   beforeEach(() => {
-    args = {
-      paths: [],
-      watch: false,
-      verbose: false,
-      showTrace: false,
-      list: false,
-      recurse: false,
-      debug: false,
-    };
-
-    registry = {
-      __schema: schemaVer,
-      settings: {
-        list: false,
-        watch: false,
-        verbose: false,
-        trace: false,
-      },
-      testSpec: [
-        {
-          path: "./dummy.nix",
-          suites: [
-            {
-              name: "Dummy",
-              cases: [
-                {
-                  name: "is a dummy suite",
-                  expressions: [true],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    };
-
+    args = { ...defaultArgs };
+    registry = { ...defaultRegistry };
     container.snapshot();
   });
 
@@ -91,6 +58,7 @@ describe("App", () => {
 
   it("runs in flake mode when no path is given", async () => {
     nixService.fetch.mockReturnValueOnce(registry);
+    args.paths = [];
 
     await sut.run(args);
 
@@ -100,7 +68,6 @@ describe("App", () => {
 
   it("runs in standalone mode when a path is given", async () => {
     testService.run.mockReturnValueOnce([]);
-
     args.paths = ["."];
 
     await sut.run(args);

@@ -18,15 +18,16 @@
   },
   "devDependencies": {
     "@types/node": "^18.16.12",
-    "ink-testing-library": "^2.1.0",
+    "@types/react": "^18.2.17",
+    "ink-testing-library": "^3.0.0",
     "typescript": "^5.0.4",
     "vitest": "^0.31.0"
   },
   "dependencies": {
+    "@commander-js/extra-typings": "^11.0.0",
     "chokidar": "^3.5.3",
     "colors": "^1.4.0",
     "commander": "^11.0.0",
-    "@commander-js/extra-typings": "^11.0.0",
     "ink": "^4.2.0",
     "inversify": "^6.0.1",
     "inversify-binding-decorators": "^4.0.0",

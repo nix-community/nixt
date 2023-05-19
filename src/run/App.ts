@@ -6,8 +6,8 @@ import {
   INixService,
   IRenderService,
   TestService,
-} from "./interfaces.js";
-import { CliArgs, Schema, schema, schemaVer } from "./types.js";
+} from "../interfaces.js";
+import { CliArgs, Schema, schema, schemaVer } from "../types.js";
 
 @provide(IApp)
 export class App implements IApp {

@@ -48,3 +48,12 @@ export type CliArgs = {
   recurse: boolean;
   debug: boolean;
 };
+
+export type TOptions = {
+  watch: boolean;
+  verbose: boolean;
+  showTrace: boolean;
+  list: boolean;
+  recurse: boolean;
+  debug: boolean;
+};

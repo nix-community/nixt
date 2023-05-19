@@ -1,0 +1,25 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Ink Run > renders expected default frame 1`] = `
+"{
+    \\"paths\\": [],
+    \\"watch\\": false,
+    \\"verbose\\": false,
+    \\"showTrace\\": false,
+    \\"list\\": false,
+    \\"recurse\\": true,
+    \\"debug\\": false
+}"
+`;
+
+exports[`Ink Watch > renders expected default frame 1`] = `
+"{
+    \\"paths\\": [],
+    \\"watch\\": false,
+    \\"verbose\\": false,
+    \\"showTrace\\": false,
+    \\"list\\": false,
+    \\"recurse\\": true,
+    \\"debug\\": false
+}"
+`;
