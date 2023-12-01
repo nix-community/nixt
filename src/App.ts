@@ -40,7 +40,11 @@ export class App implements IApp {
       args.paths.push(testFile.path);
     }
 
-    if (args.watch === true || schema.settings.watch === true) {
+    args.verbose = [args.verbose[0] || schema.settings.verbose, args.verbose[1] || schema.settings.trace];
+    args.list = args.list || schema.settings.list;
+    args.watch = args.watch || schema.settings.watch;
+
+    if (args.watch) {
       this.watcher.add(args.paths);
       this.watcher.on("all", () => {
         this.run(args);
