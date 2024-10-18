@@ -21,7 +21,7 @@ Add Nixt as a flake to your configuration:
 #+begin_src nix
 {
   inputs.nixt = {
-    url = "path:/home/ldlework/src/nixt";
+    url = "github:nix-community/nixt";
     inputs.nixpkgs.follows = "nixpkgs";
   };
 }
