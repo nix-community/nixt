@@ -287,7 +287,7 @@ Creates a =Block= from a =path= and =attrset=.
   nixt,
   pkgs ? import <nixpkgs> {}
 }:
-nixt.block ./block.spec.nix {
+nixt.block' ./block.spec.nix {
   "nixt"."passes this test" = true;
   "nixt"."fails this test" = false;
 }
